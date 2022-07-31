@@ -1,0 +1,52 @@
+.messages {
+    padding-bottom: 80px;
+    height: 100%;
+}
+
+.drawer-wrapper {
+    position: relative;
+}
+
+.ant-input-group.send-input {
+    position: absolute;
+    bottom: 32px;
+}
+
+.my-message {
+    text-align: right;
+}
+
+.msg-item {
+    background: #ccc;
+    color: #222;
+}
+
+.my-message .msg-item {
+    background: rgb(142, 226, 142);
+    padding: 8px 15px;
+    border-radius: 8px;
+}
+
+.conversation-item {
+    font-size: 22px;
+}
+
+.conversation-item button {
+    margin-left: 120px;
+}
+
+.conversation-item .nft-btns button {
+    margin-left: 15px;
+    width: 215px;
+    height: 36px;
+}
+
+.conversation-item .nft-btns {
+    padding-top: 20px;
+}
+
+.conversation-item img {
+    width: 64px;
+    border-radius: 32px;
+    margin-right: 15px;
+}
