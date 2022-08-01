@@ -1,13 +1,13 @@
 import { Modal, Input, notification, Upload } from 'antd';
-import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
-import Arweave from "arweave";
+import { PlusOutlined } from '@ant-design/icons';
 import Compressor from 'compressorjs';
 import { useState } from 'react';
-import ArweaveImage from './ArweaveImage';
 import { APP_NAME } from '../helpers/utils';
+import './PostModal.css';
+
+
 const ethers = require("ethers");
 const { TextArea } = Input;
-const { Dragger } = Upload;
 
 const PostModal = ({isModalVisible, handleOk, handleCancel, bundlr}) => {
 
@@ -16,10 +16,7 @@ const PostModal = ({isModalVisible, handleOk, handleCancel, bundlr}) => {
     const [fileCost, setFileCost] = useState()
     const [localImage, setLocalImage] = useState()
     const [imageType, setImageType] = useState();
-    const [loading, setLoading] = useState(false);
     const [postLoading, setPostLoading] = useState(false);
-    const [uploadTx, setUploadTx] = useState();
-    const [URI, setURI] = useState()
 
     const onChange = (e) => {
         setContent(e.target.value);
@@ -50,7 +47,7 @@ const PostModal = ({isModalVisible, handleOk, handleCancel, bundlr}) => {
 
     const post = async () => {
         setPostLoading(true);
-        if (!content && !uploadTx) {
+        if (!content && !file) {
             notification['error']({
                 message: 'Error',
                 description:
@@ -62,9 +59,17 @@ const PostModal = ({isModalVisible, handleOk, handleCancel, bundlr}) => {
                 { name: 'App-Name', value: APP_NAME }
             ]
 
-            const imageURI = uploadTx ? ('https://arweave.net/'+uploadTx.id) : '';
+            let imageURI = '';
+            if (file) {
+                const uri = await uploadFile();
+                if (!uri) {
+                    setPostLoading(false);
+                    return;
+                }
+                imageURI = uri;
+            }
 
-            const video = {
+            const feed = {
                 content,
                 imageURI,
                 createdAt: new Date(),
@@ -72,7 +77,7 @@ const PostModal = ({isModalVisible, handleOk, handleCancel, bundlr}) => {
             }
 
             try {
-                let tx = await bundlr.createTransaction(JSON.stringify(video), { tags })
+                let tx = await bundlr.createTransaction(JSON.stringify(feed), { tags })
                 await tx.sign()
                 const { data } = await tx.upload()
 
@@ -91,7 +96,7 @@ const PostModal = ({isModalVisible, handleOk, handleCancel, bundlr}) => {
 
     const clear = () => {
         setImageType(null);
-        setUploadTx(null);
+        setFile(null);
         setContent('');
     }
 
@@ -103,16 +108,17 @@ const PostModal = ({isModalVisible, handleOk, handleCancel, bundlr}) => {
     }
     
     async function uploadFile() {
-        if (!file) return
+        if (!file) return undefined
         const tags = [{ name: 'Content-Type', value: imageType }]
         try {
           let tx = await bundlr.uploader.upload(file, tags)
-          setURI(`http://arweave.net/${tx.data.id}`)
+          return `http://arweave.net/${tx.data.id}`;
         } catch (err) {
           notification["error"]({
             message: "File Upload Error",
             description: err.toString()
           })
+          return undefined
         }
     }
 
@@ -136,12 +142,13 @@ const PostModal = ({isModalVisible, handleOk, handleCancel, bundlr}) => {
                 customRequest={customRequest}
             >
                 {localImage ? (
-                    <img src={localImage} />
+                    <img className='preview-img' src={localImage} />
                 ) : (<div>
-                    {loading ? <LoadingOutlined /> : <PlusOutlined />}
+                    <PlusOutlined />
                     <div style={{ marginTop: 8 }}>Upload</div>
                 </div>)}
             </Upload>
+            {localImage && <p>Estimated Upload Cost: {parseFloat(fileCost).toFixed(8)} MATIC</p>}
         </div>
         
         <TextArea showCount maxLength={140} style={{ height: 100 }} onChange={onChange} value={content} />

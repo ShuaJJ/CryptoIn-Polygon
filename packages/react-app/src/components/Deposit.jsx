@@ -5,50 +5,41 @@ import { useEffect, useState } from 'react';
 const ethers = require("ethers");
 const { BigNumber } = ethers;
 
-export default function Deposit({ address, bundlr }) {
+export default function Deposit({ address, bundlr, balance, getBalance }) {
 
-    const [balance, setBalance] = useState("0.0");
     const [loading, setLoading] = useState(false);
     const [amount, setAmount] = useState(0.01);
 
     async function fundWallet() {
       if (!amount) return
       const amountParsed = parseInput(amount)
+      setLoading(true);
       try {
         await bundlr.fund(amountParsed)
-        getBalance()
+        await getBalance()
+        setLoading(false);
       } catch (err) {
         notification["error"]({
           message: 'Error funding wallet',
           description:
             err.toString(),
         });
+        setLoading(false);
       }
     }
   
     function parseInput (input) {
-      const conv = new BigNumber(input).multipliedBy(bundlr.currencyConfig.base[1])
-      if (conv.isLessThan(0.1)) {
+      const value = parseFloat(input);
+      if (value < 0.01) {
         notification["error"]({
           message: 'Error',
-          description: "Cannot deposit less than 0.1 matic",
+          description: "Cannot deposit less than 0.01 matic",
         });
         return
       } else {
-        return conv
+        return value * bundlr.currencyConfig.base[1]
       }
     }
-
-    const getBalance = async () => {
-        const bal = await bundlr.getLoadedBalance()
-        setBalance(ethers.utils.formatEther(bal.toString()))
-    }
-
-    useEffect(() => {
-        if (bundlr) {
-            getBalance();
-        }
-    }, [bundlr])
 
     const onChange = (value) => {
         setAmount(value);
@@ -62,9 +53,7 @@ export default function Deposit({ address, bundlr }) {
       };
     
       const handleOk = async () => {
-        setLoading(true);
         await fundWallet();
-        setLoading(false);
         setIsModalVisible(false);
       };
     
@@ -73,10 +62,13 @@ export default function Deposit({ address, bundlr }) {
       };
 
 
-    return <>
+    return <div style={{display: 'flex', justifyContent: 'space-between'}}>
+      <div style={{fontSize: '17px', lineHeight: '32px'}}>
+        {address && (address.substring(0, 6) +  '...' + address.substring(address.length-4, address.length))} <WalletOutlined /> {parseFloat(balance).toFixed(4)}
+      </div>
 
     <Button type="primary" onClick={showModal}>
-        {address && (address.substring(0, 4) +  '...' + address.substring(address.length-4, address.length))} <WalletOutlined /> {balance}
+        Fund My Wallet
       </Button>
       <Modal 
         title="Deposit to your CryptoIn wallet" 
@@ -89,7 +81,7 @@ export default function Deposit({ address, bundlr }) {
           <div style={{margin: "15px 0"}}>Deposit ethers to the CryptoIn wallet, and later use them to tip others</div>
         <InputNumber min={0.01} max={9999} value={amount} onChange={onChange} style={{width: "100%"}} />
       </Modal>
-    </>
+    </div>
 
 
   }

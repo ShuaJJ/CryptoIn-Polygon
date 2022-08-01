@@ -1,7 +1,7 @@
 import Arweave from 'arweave'
 
 export const arweave = Arweave.init({})
-export const APP_NAME = process.env.NEXT_PUBLIC_ARWEAVE_APP_NAME || "PERMA_VIDEO_APP_TEST_NAME"
+export const APP_NAME = "CryptoIn"
 
 export const createPostInfo = async (node) => {
   const ownerAddress = node.owner.address;
@@ -66,23 +66,22 @@ export const createPostInfo = async (node) => {
 }
 
 export const getPosts = async (owners) => {
-  return [];
-  // try {
-  //   const query = buildQuery(owners)
-  //   const results = await arweave.api.post('/graphql', query)
-  //     .catch(err => {
-  //       console.error('GraphQL query failed')
-  //       throw new Error(err);
-  //     });
-  //   const edges = results.data.data.transactions.edges
-  //   const posts = await Promise.all(
-  //     edges.map(async edge => await createPostInfo(edge.node))
-  //   )
-  //   let sorted = posts.sort((a, b) => new Date(b.request.data.createdAt) - new Date(a.request.data.createdAt))
-  //   sorted = sorted.map(s => s.request.data)
-  //   return sorted;
-  // } catch (err) {
-  //   console.log("Getting posts error: ", err);
-  //   return [];
-  // }
+  try {
+    const query = buildQuery(owners)
+    const results = await arweave.api.post('/graphql', query)
+      .catch(err => {
+        console.error('GraphQL query failed')
+        throw new Error(err);
+      });
+    const edges = results.data.data.transactions.edges
+    const posts = await Promise.all(
+      edges.map(async edge => await createPostInfo(edge.node))
+    )
+    let sorted = posts.sort((a, b) => new Date(b.request.data.createdAt) - new Date(a.request.data.createdAt))
+    sorted = sorted.map(s => s.request.data)
+    return sorted;
+  } catch (err) {
+    console.log("Getting posts error: ", err);
+    return [];
+  }
 }

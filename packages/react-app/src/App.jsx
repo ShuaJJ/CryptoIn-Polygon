@@ -18,7 +18,7 @@ import Conversations from "./views/Conversations";
 import { LoadingOutlined } from "@ant-design/icons";
 
 const { ethers } = require("ethers");
-const initialNetwork = NETWORKS.mumbai;
+const initialNetwork = NETWORKS.polygon;
 const USE_BURNER_WALLET = false; // toggle burner wallet feature
 
 const web3Modal = Web3ModalSetup();
@@ -68,7 +68,7 @@ function App(props) {
         setAddress(newAddress);
 
         const chainId = await userSigner.getChainId();
-        setIsPolygon(chainId == 80001);
+        setIsPolygon(chainId == 137);
         
       }
     }

@@ -10,10 +10,10 @@ export default function CryptoInGrid({ activities, columnCount = 3 }) {
                 columnClassName="activity-column"
                 breakpointCols={columnCount}
             >
-                {activities.map((activity) => {
-                return <div className="activity-item">
-                    {activity.contents && <ArweaveImage txId={activity.contents[0].address[0]} />}
-                    {activity.summary}
+                {activities.map((activity, index) => {
+                return <div className="activity-item" key={index}>
+                    {activity.imageURI && <img src={activity.imageURI} />}
+                    {activity.content}
                 </div>
                 })}  
             </Masonry>

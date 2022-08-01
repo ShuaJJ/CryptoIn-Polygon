@@ -7,7 +7,9 @@ import { getPosts } from "../helpers/utils";
 import Deposit from "../components/Deposit";
 import "./MyAccount.css";
 
-export default function MyAccount({ provider, address, loadWeb3Modal, isPolygon }) {
+const ethers = require("ethers");
+
+export default function MyAccount({ provider, address, isPolygon }) {
 
   const btnStyle = {
     width: "100%",
@@ -22,6 +24,7 @@ export default function MyAccount({ provider, address, loadWeb3Modal, isPolygon 
 
   const [bundlr, setBundlr] = useState();
   const [bundlrLoading, setBundlrLoading] = useState(false);
+  const [balance, setBalance] = useState("0.0");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [activities, setActivities] = useState([]);
 
@@ -30,9 +33,17 @@ export default function MyAccount({ provider, address, loadWeb3Modal, isPolygon 
     setActivities(posts);
   }
 
+  const getBalance = async () => {
+    const bal = await bundlr.getLoadedBalance()
+    setBalance(ethers.utils.formatEther(bal.toString()))
+  }
+
   useEffect(() => {
-    getActivities();
-  }, [])
+    if (bundlr) {
+      getActivities();
+      getBalance();
+    }
+  }, [bundlr])
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -71,16 +82,24 @@ export default function MyAccount({ provider, address, loadWeb3Modal, isPolygon 
 
   if (!isPolygon) {
     return <div className="connect-info">
-      Please switch to Polygon Mumbai first
+      Please switch to Polygon first
     </div>
   }
 
+  const noBalance = !balance || parseFloat(balance) == 0.0;
+
   return (
     <div style={{ width: "100%", maxWidth: "666px", margin: "0 auto", paddingTop: "32px"}}>
-      {bundlr && <Deposit address={address} bundlr={bundlr} />}
-      {bundlr ? <Button style={btnStyle} onClick={showModal}>Post</Button> : 
+      {bundlr ? (
+        <div>
+          <Deposit address={address} bundlr={bundlr} balance={balance} getBalance={getBalance} />
+          <Button style={btnStyle} disabled={noBalance} onClick={showModal}>Post</Button>
+          {noBalance && <p style={{marginTop: '8px'}}>To post, you have to fund your wallet with MATIC first</p>}
+        </div>
+      ) : (
         <Button style={btnStyle} onClick={connectBundlr} loading={bundlrLoading}>Connect to Bundlr</Button>
-      }
+      )}
+
       <CryptoInGrid activities={activities} />
       <PostModal isModalVisible={isModalVisible} handleOk={handleOk} handleCancel={handleCancel} bundlr={bundlr} />
     </div>
