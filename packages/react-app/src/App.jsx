@@ -12,9 +12,7 @@ import { NETWORKS, ALCHEMY_KEY } from "./constants";
 import { Web3ModalSetup } from "./helpers";
 import { Home, MyAccount } from "./views";
 import { useStaticJsonRPC } from "./hooks";
-import { WebBundlr } from "@bundlr-network/client"
 import Following from "./views/Following";
-import Deposit from "./components/Deposit";
 import Tip from "./components/Tip";
 import Conversations from "./views/Conversations";
 import { LoadingOutlined } from "@ant-design/icons";
@@ -37,7 +35,6 @@ function App(props) {
   const [injectedProvider, setInjectedProvider] = useState();
   const [address, setAddress] = useState();
   const [isPolygon, setIsPolygon] = useState(false);
-  const [bundlr, setBundlr] = useState();
   const [userSigner, setUserSigner] = useState();
   const [selectedNetwork, setSelectedNetwork] = useState(initialNetwork.name);
   const location = useLocation();
@@ -73,9 +70,6 @@ function App(props) {
         const chainId = await userSigner.getChainId();
         setIsPolygon(chainId == 80001);
         
-        const br = new WebBundlr("https://node1.bundlr.network", "matic", injectedProvider)
-        await br.ready()
-        setBundlr(br);
       }
     }
     getAddress();
@@ -115,10 +109,6 @@ function App(props) {
     }
   }, [loadWeb3Modal]);
 
-  const canUse = isPolygon && bundlr;
-  console.log('AAAAA', isPolygon);
-  console.log('AAAAA', bundlr);
-
   return (
     <div className="App">
       {/* ✏️ Edit the header and change the title to your project name */}
@@ -126,7 +116,6 @@ function App(props) {
         {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
         <div style={{ position: "relative", display: "flex", flexDirection: "column" }}>
           <div style={{ display: "flex", flex: 1, paddingTop: "8px" }}>
-            {canUse ? <Deposit address={address} signer={userSigner} /> : (userSigner && <span>Please switch to Mumbai</span>)}
             <Account
               useBurner={USE_BURNER_WALLET}
               address={address}
@@ -158,7 +147,7 @@ function App(props) {
         </Menu.Item>
       </Menu>
 
-      {canUse ? <Switch>
+      <Switch>
         <Route exact path="/">
           {/* pass in any web3 props to this Home component. For example, yourLocalBalance */}
           <Home />
@@ -167,12 +156,12 @@ function App(props) {
           <Following />
         </Route>
         <Route path="/mine">
-          <MyAccount provider={injectedProvider} address={address} loadWeb3Modal={loadWeb3Modal} bundlr={bundlr} />
+          <MyAccount provider={injectedProvider} address={address} loadWeb3Modal={loadWeb3Modal} isPolygon={isPolygon} />
         </Route>
         <Route exact path="/chats">
           <Conversations provider={injectedProvider} />
         </Route>
-      </Switch> : <div style={{color: "#00ACF1", fontSize: "18px", marginTop: '32px', fontWeight: "600"}}>Please connect your wallet first and be sure you are on Polygon Mumbai</div>}
+      </Switch>
 
     </div>
   );

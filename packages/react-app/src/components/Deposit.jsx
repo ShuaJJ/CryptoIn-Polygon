@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 const ethers = require("ethers");
 const { BigNumber } = ethers;
 
-export default function Deposit({ address, signer, bundlr }) {
+export default function Deposit({ address, bundlr }) {
 
     const [balance, setBalance] = useState("0.0");
     const [loading, setLoading] = useState(false);
