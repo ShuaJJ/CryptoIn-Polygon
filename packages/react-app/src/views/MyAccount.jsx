@@ -2,8 +2,9 @@ import { Button } from "antd";
 import React, { useEffect, useState } from "react";
 import CryptoInGrid from "../components/Grid";
 import PostModal from "../components/PostModal";
+import { getPosts } from "../helpers/utils";
 
-export default function MyAccount({ provider, address, loadWeb3Modal }) {
+export default function MyAccount({ provider, address, loadWeb3Modal, bundlr }) {
 
   const btnStyle = {
     width: "100%",
@@ -50,7 +51,7 @@ export default function MyAccount({ provider, address, loadWeb3Modal }) {
       ) : (
         <Button style={btnStyle} onClick={loadWeb3Modal}>Connect Wallet</Button>
       )}
-      <PostModal isModalVisible={isModalVisible} handleOk={handleOk} handleCancel={handleCancel} />
+      <PostModal isModalVisible={isModalVisible} handleOk={handleOk} handleCancel={handleCancel} bundlr={bundlr} />
     </div>
   );
 }

@@ -3,6 +3,7 @@ import { InputNumber, Modal, Button, notification } from 'antd';
 import { InfoOutlined, WalletOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
 const ethers = require("ethers");
+const { BigNumber } = ethers;
 
 export default function Deposit({ address, signer, bundlr }) {
 
@@ -44,10 +45,10 @@ export default function Deposit({ address, signer, bundlr }) {
     }
 
     useEffect(() => {
-        if (signer) {
+        if (bundlr) {
             getBalance();
         }
-    }, [signer])
+    }, [bundlr])
 
     const onChange = (value) => {
         setAmount(value);

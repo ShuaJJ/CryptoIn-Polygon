@@ -73,8 +73,9 @@ function App(props) {
         const chainId = await userSigner.getChainId();
         setIsPolygon(chainId == 80001);
         
-        const bundlr = new WebBundlr("https://node1.bundlr.network", "matic", injectedProvider)
-        await bundlr.ready()
+        const br = new WebBundlr("https://node1.bundlr.network", "matic", injectedProvider)
+        await br.ready()
+        setBundlr(br);
       }
     }
     getAddress();
@@ -114,6 +115,10 @@ function App(props) {
     }
   }, [loadWeb3Modal]);
 
+  const canUse = isPolygon && bundlr;
+  console.log('AAAAA', isPolygon);
+  console.log('AAAAA', bundlr);
+
   return (
     <div className="App">
       {/* ✏️ Edit the header and change the title to your project name */}
@@ -121,7 +126,7 @@ function App(props) {
         {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
         <div style={{ position: "relative", display: "flex", flexDirection: "column" }}>
           <div style={{ display: "flex", flex: 1, paddingTop: "8px" }}>
-            {isPolygon ? <Deposit address={address} signer={userSigner} /> : (userSigner && <span>Please switch to Mumbai</span>)}
+            {canUse ? <Deposit address={address} signer={userSigner} /> : (userSigner && <span>Please switch to Mumbai</span>)}
             <Account
               useBurner={USE_BURNER_WALLET}
               address={address}
@@ -153,7 +158,7 @@ function App(props) {
         </Menu.Item>
       </Menu>
 
-      {userSigner ? <Switch>
+      {canUse ? <Switch>
         <Route exact path="/">
           {/* pass in any web3 props to this Home component. For example, yourLocalBalance */}
           <Home />
@@ -162,25 +167,13 @@ function App(props) {
           <Following />
         </Route>
         <Route path="/mine">
-          <MyAccount provider={injectedProvider} address={address} loadWeb3Modal={loadWeb3Modal} />
+          <MyAccount provider={injectedProvider} address={address} loadWeb3Modal={loadWeb3Modal} bundlr={bundlr} />
         </Route>
         <Route exact path="/chats">
           <Conversations provider={injectedProvider} />
         </Route>
-      </Switch> : <div style={{color: "#00ACF1", fontSize: "18px", marginTop: '32px', fontWeight: "600"}}>Please connect your wallet first</div>}
+      </Switch> : <div style={{color: "#00ACF1", fontSize: "18px", marginTop: '32px', fontWeight: "600"}}>Please connect your wallet first and be sure you are on Polygon Mumbai</div>}
 
-      <div className="footer">
-              <strong style={{fontSize: '17px'}}>Stack</strong>
-              <p>Read/post feeds & Permanent storage service - <a href="https://www.arweave.org/" target="_blank"><img src="/nav-logo.svg" /> arweave</a></p>
-              <p>Contracts editor and deployment - <a href="https://chainide.com/" target="_blank">ChainIDE</a></p>
-              <p>Chats feature(secure messaging protocol) - <a href="https://xmtp.com/" target="_blank"><img src="https://xmtp.com/logos/main.svg" /> XMTP Labs</a></p>
-              <p>Decentralized Access Control - <a href="https://litprotocol.com/" target="_blank"><img src="https://litprotocol.com/lit-logo.png" /> Lit Protocol</a></p>
-              <p>Follow Connections - <a href="https://cyberconnect.me/" target="_blank"><img src="https://cyberconnect.me/_next/image?url=%2Fassets%2Fgrains.svg&w=64&q=75" /> CyberConnect</a></p>
-              <br/>
-              <strong style={{fontSize: '17px'}}>Joshua Jiang - The Developer</strong>
-              <div style={{marginBottom: "15px"}}>I am a web3 developer who is currently working for <a href="https://theunit.one">The Unit</a>. I am glad about registering this Hackthon and learned all these new projects. </div>
-              {isPolygon && <Tip signer={userSigner} />}
-      </div>
     </div>
   );
 }
