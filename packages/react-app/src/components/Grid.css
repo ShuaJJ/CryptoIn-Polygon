@@ -1,21 +1,30 @@
-.activity-item img {
-    margin-bottom: 8px;
+.activities .ant-list-item-meta-content {
+    text-align: left;
 }
 
-.activities {
-    padding-top: 32px;
-    display: -webkit-box; /* Not needed if autoprefixing */
-    display: -ms-flexbox; /* Not needed if autoprefixing */
-    display: flex;
-    margin-left: -30px; /* gutter size offset */
-    width: auto;
-}
-.activity-column {
-    padding-left: 15px; /* gutter size */
-    background-clip: padding-box;
+.activities .ant-list-item-meta-description {
+    color: #fff;
+    font-size: 18px;
 }
 
-/* Style your items */
-.activity-column > div { /* change div to reference your elements you put in <Masonry> */
-    margin-bottom: 32px;
+.activities .ant-list-item-meta-title {
+    color: rgba(255, 255, 255, 0.45);
+    font-weight: 400;
+    font-size: 16px;
+}
+
+.ant-list-item-meta-avatar .ant-avatar {
+    display: block;
+    margin: 0 auto;
+    margin-bottom: 15px;
+}
+
+.ant-list-item-meta-avatar .ant-avatar, 
+.ant-list-item-meta-avatar .ant-avatar img {
+    width: 48px;
+    height: 48px;
+}
+
+.activities .ant-list-item-meta-avatar {
+    margin-right: 32px;
 }

@@ -1,20 +1,29 @@
-import Masonry from 'react-masonry-css'
-import ArweaveImage from "../components/ArweaveImage";
+import { Avatar, Button, List, Skeleton, Image } from 'antd';
+import React, { useEffect, useState } from 'react'
 import './Grid.css';
 
 
-export default function CryptoInGrid({ activities, columnCount = 3 }) {
+export default function CryptoInGrid({ activities, address }) {
 
-    return <Masonry
-                className="activities"
-                columnClassName="activity-column"
-                breakpointCols={columnCount}
-            >
-                {activities.map((activity, index) => {
-                return <div className="activity-item" key={index}>
-                    {activity.imageURI && <img src={activity.imageURI} />}
-                    {activity.content}
+    return <List
+        className="activities"
+        itemLayout="horizontal"
+        dataSource={activities}
+        renderItem={(item) => (
+        <List.Item>
+            <Skeleton avatar title={false} loading={item.loading} active>
+            <List.Item.Meta
+                avatar={<div>
+                    <Avatar src="/avatar.png" />
+                    {<Button type='primary'>Follow</Button>}
                 </div>
-                })}  
-            </Masonry>
+                }
+                title={item.createdBy.substring(0, 6) + '....' + item.createdBy.substring(item.createdBy.length-6)}
+                description={item.content}
+            />
+            {item.imageURI && <div><Image height={120} src={item.imageURI} /></div>}
+            </Skeleton>
+        </List.Item>
+        )}
+    />
   }
