@@ -9,7 +9,7 @@ import CryptoInGrid from "../components/Grid";
  * @param {*} readContracts contracts from current chain already pre-loaded using ethers contract module. More here https://docs.ethers.io/v5/api/contract/contract/
  * @returns react component
  **/
-function Home({ address }) {
+function Home({ address, provider }) {
   
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -31,7 +31,7 @@ function Home({ address }) {
       <div style={{fontSize: '32px', color: '#fff', margin: '32px 0', textAlign: 'center'}}>
         <LoadingOutlined />
       </div> : <div style={{margin: '32px auto', maxWidth: "1000px"}}>
-        <CryptoInGrid activities={activities} address={address} />
+        <CryptoInGrid activities={activities} myAddress={address} provider={provider} />
       </div>
       }
     </div>

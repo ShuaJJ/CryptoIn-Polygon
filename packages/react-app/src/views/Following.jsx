@@ -4,7 +4,7 @@ import React, {useState, useEffect} from "react";
 import { getPosts } from '../helpers/utils'
 import CryptoInGrid from "../components/Grid";
 
-export default function Following() {
+export default function Following({address}) {
 
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -35,7 +35,7 @@ export default function Following() {
   return (
     <div>
       <div style={{margin: '32px auto', maxWidth: "1000px"}}>
-        <CryptoInGrid activities={activities} columnCount={5} />
+        <CryptoInGrid activities={activities} myAddress={address} />
       </div>
     </div>
   );

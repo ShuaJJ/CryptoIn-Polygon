@@ -150,10 +150,10 @@ function App(props) {
       <Switch>
         <Route exact path="/">
           {/* pass in any web3 props to this Home component. For example, yourLocalBalance */}
-          <Home address={address} />
+          <Home address={address} provider={injectedProvider} />
         </Route>
         <Route exact path="/following">
-          <Following />
+          <Following address={address} provider={injectedProvider} />
         </Route>
         <Route path="/mine">
           <MyAccount provider={injectedProvider} address={address} loadWeb3Modal={loadWeb3Modal} isPolygon={isPolygon} />

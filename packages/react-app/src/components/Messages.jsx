@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react"
 import { Drawer, Button, Input, notification } from 'antd';
-import { GraphQLClient, gql } from "graphql-request";
 import LitJsSdk from 'lit-js-sdk';
-import CyberConnect, { Env, Blockchain } from "@cyberlab/cyberconnect";
 import { CryptoInNFTABI } from '../contracts/cryptoInNFT';
 import './Messages.css';
 
@@ -14,14 +12,11 @@ export default function Messages({ provider, client, recipient, isCyberConnect }
     const [messages, setMessages] = useState([]);
     const [sendLoading, setSendLoading] = useState(false);
     const [msg, setMsg] = useState('');
-    const [followed, setFollowed] = useState(false);
-    const [followLoading, setFollowLoading] = useState(false);
     const [mintLoading, setMintLoading] = useState(false);
     const [ownNFT, setOwnNFT] = useState(false);
 
     const [visible, setVisible] = useState(false);
 
-    const graphClient = new GraphQLClient("https://api.cybertino.io/connect/");
     const litClient = new LitJsSdk.LitNodeClient();
     const nftContractAddress = "0xDD284A2BCA27495A982e79720Bf29cc599684bd1";
     const nftContract = new ethers.Contract(nftContractAddress, CryptoInNFTABI, provider.getSigner());
@@ -52,25 +47,6 @@ export default function Messages({ provider, client, recipient, isCyberConnect }
         extraData: ""
     }
 
-    const cyberConnect = new CyberConnect({
-        namespace: "CryptoIn",
-        env: Env.PRODUCTION,
-        chain: Blockchain.ETH,
-        provider: provider.provider,
-        signingMessageEntity: "CryptoIn",
-    });
-    
-    const follow = async (targetAddr) => {
-        setFollowLoading(true);
-        await cyberConnect.connect(targetAddr);
-        setFollowLoading(false);
-        getFollowers();
-    }
-    
-    const unfollow = async (targetAddr) => {
-      await cyberConnect.disconnect(targetAddr);
-    }
-
     const checkNFT = async () => {
         try {
             await litClient.connect();
@@ -94,28 +70,6 @@ export default function Messages({ provider, client, recipient, isCyberConnect }
         setMintLoading(false);
     }
 
-    const GET_CONNECTIONS = gql`
-        query($address: String!, $recipient: String!) {
-            connections(
-                fromAddr: $recipient
-                toAddrList: [$address]
-            ) {
-                followStatus {
-                    isFollowed
-                }
-            }
-        }
-        `;
-
-    const getFollowers = async () => {
-        const res = await graphClient.request(GET_CONNECTIONS, { address: client.address, recipient: recipient.address });
-        if (res?.connections && res?.connections.length > 0) {
-            setFollowed(res.connections[0].followStatus.isFollowed);
-        } else {
-            setFollowed(false);
-        }
-    }
-
     const showDrawer = async () => {
         setVisible(true);
         try {
@@ -131,13 +85,6 @@ export default function Messages({ provider, client, recipient, isCyberConnect }
     };
 
     const sendMsg = async () => {
-        if (isCyberConnect && !followed) {
-            notification['error']({
-                message: "Error",
-                description: "You haven't followed this address through CyberConnect"
-            })
-            return;
-        }
         if (!msg || msg.length < 2) {
             notification['error']({
                 message: "Error",
@@ -186,47 +133,19 @@ export default function Messages({ provider, client, recipient, isCyberConnect }
         getMsgs()
       }, [conversation])
 
-      useEffect(() => {
-        getFollowers()
-      }, [])
-
       const getActionButton = () => {
           if (isCyberConnect) {
-              if (followed) {
-                  return (
-                    <Button 
-                        onClick={showDrawer}
-                        type="primary"
-                    >
-                        Chat
-                    </Button>
-                  )
-              } else {
-                  return (
-                    <Button 
-                        onClick={() => { follow(recipient.address) }}
-                        type="primary"
-                        loading={followLoading}
-                    >
-                        Follow
-                    </Button>
-                  )
-              }
+              return (
+                <Button 
+                    onClick={showDrawer}
+                    type="primary"
+                >
+                    Chat
+                </Button>
+              )
           } else {
             return (
                 <div className="nft-btns">
-                {ownNFT ? <Button 
-                        onClick={showDrawer}
-                        type="primary"
-                    >
-                        Chat
-                    </Button> : <Button 
-                    onClick={() => { checkNFT() }}
-                    type="primary"
-                    loading={mintLoading}
-                >
-                    Check Ownership
-                </Button>}
                 <Button 
                     onClick={() => { mintNFT() }}
                     type="primary"
@@ -265,7 +184,7 @@ export default function Messages({ provider, client, recipient, isCyberConnect }
                     type="primary" 
                     onClick={sendMsg} 
                     loading={sendLoading}
-                    disabled={isCyberConnect && !followed}
+                    disabled={isCyberConnect}
                 >
                     Send
                 </Button>

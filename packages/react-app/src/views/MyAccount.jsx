@@ -100,7 +100,7 @@ export default function MyAccount({ provider, address, isPolygon }) {
         <Button style={btnStyle} onClick={connectBundlr} loading={bundlrLoading}>Connect to Bundlr</Button>
       )}
 
-      <CryptoInGrid activities={activities} address={address} />
+      <CryptoInGrid activities={activities} myAddress={address} />
       <PostModal isModalVisible={isModalVisible} handleOk={handleOk} handleCancel={handleCancel} bundlr={bundlr} />
     </div>
   );
