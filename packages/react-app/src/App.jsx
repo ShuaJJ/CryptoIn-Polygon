@@ -10,9 +10,8 @@ import {
 } from "./components";
 import { NETWORKS, ALCHEMY_KEY } from "./constants";
 import { Web3ModalSetup } from "./helpers";
-import { Home, MyAccount } from "./views";
+import { Feeds, MyAccount } from "./views";
 import { useStaticJsonRPC } from "./hooks";
-import Following from "./views/Following";
 import Tip from "./components/Tip";
 import Conversations from "./views/Conversations";
 import { LoadingOutlined } from "@ant-design/icons";
@@ -150,10 +149,10 @@ function App(props) {
       <Switch>
         <Route exact path="/">
           {/* pass in any web3 props to this Home component. For example, yourLocalBalance */}
-          <Home address={address} provider={injectedProvider} />
+          <Feeds type="home" address={address} provider={injectedProvider} />
         </Route>
         <Route exact path="/following">
-          <Following address={address} provider={injectedProvider} />
+        <Feeds type="following" address={address} provider={injectedProvider} />
         </Route>
         <Route path="/mine">
           <MyAccount provider={injectedProvider} address={address} loadWeb3Modal={loadWeb3Modal} isPolygon={isPolygon} />

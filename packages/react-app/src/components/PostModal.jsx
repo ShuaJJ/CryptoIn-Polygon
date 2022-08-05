@@ -56,7 +56,8 @@ const PostModal = ({isModalVisible, handleOk, handleCancel, bundlr}) => {
         } else {
             const tags = [
                 { name: 'Content-Type', value: 'text/plain' },
-                { name: 'App-Name', value: APP_NAME }
+                { name: 'App-Name', value: APP_NAME },
+                { name: 'Author', value: bundlr.address },
             ]
 
             let imageURI = '';

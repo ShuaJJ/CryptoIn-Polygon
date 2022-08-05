@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { WebBundlr } from "@bundlr-network/client"
 import CryptoInGrid from "../components/Grid";
 import PostModal from "../components/PostModal";
-import { getPosts } from "../helpers/utils";
 import Deposit from "../components/Deposit";
 import "./MyAccount.css";
 
@@ -26,12 +25,6 @@ export default function MyAccount({ provider, address, isPolygon }) {
   const [bundlrLoading, setBundlrLoading] = useState(false);
   const [balance, setBalance] = useState("0.0");
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [activities, setActivities] = useState([]);
-
-  const getActivities = async () => {
-    const posts = await getPosts();
-    setActivities(posts);
-  }
 
   const getBalance = async () => {
     const bal = await bundlr.getLoadedBalance()
@@ -40,7 +33,6 @@ export default function MyAccount({ provider, address, isPolygon }) {
 
   useEffect(() => {
     if (bundlr) {
-      getActivities();
       getBalance();
     }
   }, [bundlr])
@@ -99,8 +91,8 @@ export default function MyAccount({ provider, address, isPolygon }) {
       ) : (
         <Button style={btnStyle} onClick={connectBundlr} loading={bundlrLoading}>Connect to Bundlr</Button>
       )}
-
-      <CryptoInGrid activities={activities} myAddress={address} />
+      <h1 style={{marginTop: '66px'}}>My Posts</h1>
+      <CryptoInGrid type="mine" myAddress={address} provider={provider} />
       <PostModal isModalVisible={isModalVisible} handleOk={handleOk} handleCancel={handleCancel} bundlr={bundlr} />
     </div>
   );

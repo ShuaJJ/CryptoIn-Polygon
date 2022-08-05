@@ -1,7 +1,7 @@
 import { Button } from "antd";
 import { useEffect, useState } from "react";
 
-export default function FollowBtn({ cyberConnect, address, followeds, getFollowers }) {
+export default function FollowBtn({ cyberConnect, address, followeds }) {
 
     const [followed, setFollowed] = useState(false);
     const [followLoading, setFollowLoading] = useState(false);
@@ -15,12 +15,15 @@ export default function FollowBtn({ cyberConnect, address, followeds, getFollowe
 
     const follow = async () => {
         setFollowLoading(true);
-        if (followed) {
-            await cyberConnect.connect(address);
-        } else {
-            await cyberConnect.disconnect(address);
+        try {
+            if (followed) {
+                await cyberConnect.disconnect(address);
+            } else {
+                await cyberConnect.connect(address);
+            }
+        } catch(e) {
+            console.log('Follow Error', e);
         }
-        await getFollowers();
         setFollowLoading(false);
     }
 

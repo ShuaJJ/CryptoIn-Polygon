@@ -23,24 +23,24 @@ export const createPostInfo = async (node) => {
   {
     name: "App-Name",
     values: [APP_NAME]
-  },
-  {
-    name: "Content-Type",
-    values: ["text/plain"]
   }
 ]
 
- export const buildQuery = (owners) => {
+ export const buildQuery = (authors) => {
   let stringifiedTags = [...tags]
+  if (authors) {
+    stringifiedTags = [...tags, {
+      name: "Author",
+      values: authors.map((author) => author.toLowerCase())
+    }]
+  }
   stringifiedTags = JSON.stringify(stringifiedTags).replace(/"([^"]+)":/g, '$1:')
-  const allOwners = owners ? JSON.stringify(owners).replace(/"([^"]+)":/g, '$1:') : ''
 
   const queryObject = { query: `{
     transactions(
       first: 50,
-      tags: ${stringifiedTags}` + (owners ? `,
-      owners: ${allOwners}` : '') + 
-    `) {
+      tags: ${stringifiedTags}
+    ) {
       edges {
         node {
           id
@@ -69,16 +69,16 @@ export const getPosts = async (owners) => {
   try {
     const query = buildQuery(owners)
     const results = await arweave.api.post('/graphql', query)
-      .catch(err => {
-        console.error('GraphQL query failed')
-        throw new Error(err);
-      });
+    .catch(err => {
+      console.error('GraphQL query failed')
+      throw new Error(err);
+    });
     const edges = results.data.data.transactions.edges
     const posts = await Promise.all(
       edges.map(async edge => await createPostInfo(edge.node))
-    )
-    let sorted = posts.sort((a, b) => new Date(b.request.data.createdAt) - new Date(a.request.data.createdAt))
-    sorted = sorted.map(s => s.request.data)
+      )
+      let sorted = posts.sort((a, b) => new Date(b.request.data.createdAt) - new Date(a.request.data.createdAt))
+      sorted = sorted.map(s => s.request.data)
     return sorted;
   } catch (err) {
     console.log("Getting posts error: ", err);
