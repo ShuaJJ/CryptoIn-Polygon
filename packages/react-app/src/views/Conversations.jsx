@@ -1,6 +1,5 @@
 import { notification, Button } from "antd";
 import { useEffect, useState } from "react";
-import LitJsSdk from 'lit-js-sdk';
 import { CryptoInNFTABI } from '../contracts/cryptoInNFT';
 import { Client } from '@xmtp/xmtp-js'
 
@@ -20,13 +19,10 @@ export default function Conversations({ provider, address }) {
 
   const followings = useFollowings(address);
 
-  const litClient = new LitJsSdk.LitNodeClient();
-  const nftContractAddress = "0xDD284A2BCA27495A982e79720Bf29cc599684bd1";
+  const nftContractAddress = "0xBCA82456c9461ad6E28b7bf2E4Df7Ac59cfbBCbB";
   const nftContract = new ethers.Contract(nftContractAddress, CryptoInNFTABI, provider.getSigner());
 
   const signer = provider.getSigner();
-
-  const chain = 'polygon';
 
   const setupClient = async () => {
     try {
@@ -41,54 +37,33 @@ export default function Conversations({ provider, address }) {
     }
   }
 
-  // useEffect(() => {
-  //   checkNFT();
-  // }, [])
-
-  const accessControlConditions = [
-      {
-        contractAddress: nftContractAddress,
-        standardContractType: 'ERC721',
-        chain,
-        method: 'balanceOf',
-        parameters: [
-          ':userAddress'
-        ],
-        returnValueTest: {
-          comparator: '>',
-          value: '0'
-        }
-      }
-    ]
-
-  const resourceId = {
-      baseUrl: '',
-      path: '/cryptoin', // this would normally be your url path, like "/webpage.html" for example
-      orgId: "",
-      role: "",
-      extraData: ""
-  }
+  useEffect(() => {
+    checkNFT();
+  }, [])
 
   const checkNFT = async () => {
-      try {
-          await litClient.connect();
-          const authSig = await LitJsSdk.checkAndSignAuthMessage({chain})
-          const jwt = await litClient.getSignedToken({ accessControlConditions, chain, authSig, resourceId });
-          if (jwt) {
-              setOwnNFT(true);
-          }
-      } catch(e) {
-          setOwnNFT(false);
-          notification['error']({
-              message: 'Error',
-              description: e.toString()
-          })
-      }
+    try {
+      const res = await nftContract.balanceOf(address);
+      setOwnNFT(ethers.BigNumber.from(res).toNumber() > 0);
+    } catch(e) {
+      notification["error"]({
+        message: "Fetching NFT Failed",
+        description: e.toString()
+      })
+    }
   }
 
   const mintNFT = async () => {
       setMintLoading(true);
-      await nftContract.safeMint();
+      const options = {value: ethers.utils.parseEther("0.01")}
+      try {
+        await nftContract.safeMint(options);
+      } catch(e) {
+        notification["error"]({
+          message: "Transaction Failed",
+          description: e.toString()
+        })
+      }
       setMintLoading(false);
   }
 
@@ -96,7 +71,7 @@ export default function Conversations({ provider, address }) {
     <div className="convs">
       <div className="convs-intro">Here you can send encrypted message to the people you followed.</div>
       {!ownNFT && (
-        <div style={{marginBottom: '64px'}}>
+        <div>
           <div className="convs-rule">You need a messaging NFT from CryptoIn to enable this feature.</div>
           <Button 
               onClick={() => { mintNFT() }}
@@ -108,7 +83,7 @@ export default function Conversations({ provider, address }) {
         </div>
       )}
 
-
+        <div style={{marginTop: '64px'}}>
 
         {followings?.map((following) => <Messages 
           provider={provider} 
@@ -117,6 +92,8 @@ export default function Conversations({ provider, address }) {
           enabled={ownNFT} 
           setupClient={setupClient}
         /> )}
+        </div>
+
 
 
       </div>

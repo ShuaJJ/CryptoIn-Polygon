@@ -8,6 +8,7 @@ export default function Messages({ provider, client, recipient, enabled, setupCl
     const [conversation, setConversation] = useState(null)
     const [messages, setMessages] = useState([]);
     const [sendLoading, setSendLoading] = useState(false);
+    const [clientLoading, setClientLoading] = useState(false);
     const [msg, setMsg] = useState('');
 
     const [visible, setVisible] = useState(false);
@@ -20,14 +21,24 @@ export default function Messages({ provider, client, recipient, enabled, setupCl
             return
         }
         if (!client) {
-            await setupClient();
-        }
-        setVisible(true);
-        try {
-            const nconv = await client.conversations.newConversation(recipient);
-            setConversation(nconv);
-        } catch(e) {
-            console.log('UUUUU1', e);
+            setClientLoading(true);
+            try {
+                await setupClient();
+                setClientLoading(false);
+                setVisible(true);
+                try {
+                    const nconv = await client.conversations.newConversation(recipient);
+                    setConversation(nconv);
+                } catch(e) {
+                    console.log('Creating Conversation Error: ', e);
+                }
+            } catch(e) {
+                notification["error"]({
+                    message: "Setup Client Error",
+                    description: "Failed to setup a xmtp client, please try again later"
+                })
+                setClientLoading(false);
+            }
         }
     };
 
@@ -90,6 +101,7 @@ export default function Messages({ provider, client, recipient, enabled, setupCl
                 <Button 
                     onClick={showDrawer}
                     type="primary"
+                    loading={clientLoading}
                 >
                     Chat
                 </Button>
@@ -105,7 +117,7 @@ export default function Messages({ provider, client, recipient, enabled, setupCl
             </div>
             {getActionButton()}
         </div>
-        <Drawer title={"Chat with " + recipient} placement="right" onClose={onClose} visible={visible} className="drawer-wrapper" width={555}>
+        <Drawer title={"Chat with " + shortenAddress(recipient)} placement="right" onClose={onClose} visible={visible} className="drawer-wrapper" width={555}>
             <div className="messages">
                 {messages.map((msg) => {
                     const isSender = msg.senderAddress === recipient
