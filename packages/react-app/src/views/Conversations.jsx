@@ -55,7 +55,7 @@ export default function Conversations({ provider, address }) {
 
   const mintNFT = async () => {
       setMintLoading(true);
-      const options = {value: ethers.utils.parseEther("0.01")}
+      const options = {value: ethers.utils.parseEther("2")}
       try {
         await nftContract.safeMint(options);
       } catch(e) {
