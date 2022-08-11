@@ -19,7 +19,7 @@ export default function Conversations({ provider, address }) {
 
   const followings = useFollowings(address);
 
-  const nftContractAddress = "0xBCA82456c9461ad6E28b7bf2E4Df7Ac59cfbBCbB";
+  const nftContractAddress = "0x779c99468735b9c3e7CA1f54BB0450D349A9af8f";
   const nftContract = new ethers.Contract(nftContractAddress, CryptoInNFTABI, provider.getSigner());
 
   const signer = provider.getSigner();
