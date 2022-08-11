@@ -2,6 +2,7 @@ import {WalletABI} from '../contracts/wallet';
 import { InputNumber, Modal, Button, notification } from 'antd';
 import { InfoOutlined, WalletOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
+import { shortenAddress } from '../helpers/utils';
 const ethers = require("ethers");
 const { BigNumber } = ethers;
 
@@ -64,7 +65,7 @@ export default function Deposit({ address, bundlr, balance, getBalance }) {
 
     return <div style={{display: 'flex', justifyContent: 'space-between'}}>
       <div style={{fontSize: '17px', lineHeight: '32px'}}>
-        {address && (address.substring(0, 6) +  '...' + address.substring(address.length-4, address.length))} <WalletOutlined /> {parseFloat(balance).toFixed(4)}
+        {address && shortenAddress(address)} <WalletOutlined /> {parseFloat(balance).toFixed(4)}
       </div>
 
     <Button type="primary" onClick={showModal}>

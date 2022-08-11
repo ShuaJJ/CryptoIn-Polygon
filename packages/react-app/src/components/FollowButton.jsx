@@ -1,7 +1,7 @@
 import { Button } from "antd";
 import { useEffect, useState } from "react";
 
-export default function FollowBtn({ cyberConnect, address, followeds }) {
+export default function FollowBtn({ address, followeds, cyberConnect }) {
 
     const [followed, setFollowed] = useState(false);
     const [followLoading, setFollowLoading] = useState(false);

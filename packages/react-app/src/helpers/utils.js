@@ -3,6 +3,17 @@ import Arweave from 'arweave'
 export const arweave = Arweave.init({})
 export const APP_NAME = "CryptoIn"
 
+export const btnStyle = {
+  width: "100%",
+  backgroundColor: "#00D3C5",
+  border: "none",
+  color: "#222",
+  height: "56px",
+  fontSize: "18px",
+  fontWeight: "600",
+  marginTop: "24px"
+}
+
 export const createPostInfo = async (node) => {
   const ownerAddress = node.owner.address;
   const height = node.block ? node.block.height : -1;
@@ -84,4 +95,8 @@ export const getPosts = async (owners) => {
     console.log("Getting posts error: ", err);
     return [];
   }
+}
+
+export const shortenAddress = (address) => {
+  return address.substring(0, 5) + '....' + address.substring(address.length-5)
 }

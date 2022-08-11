@@ -29,10 +29,14 @@
 
 .conversation-item {
     font-size: 22px;
+    display: flex;
+    justify-content: space-between;
+    max-width: 500px;
+    margin: 32px auto;
 }
 
 .conversation-item button {
-    margin-left: 120px;
+    margin-top: 15px;
 }
 
 .conversation-item .nft-btns button {

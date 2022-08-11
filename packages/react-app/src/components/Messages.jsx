@@ -1,79 +1,30 @@
 import { useState, useEffect } from "react"
 import { Drawer, Button, Input, notification } from 'antd';
-import LitJsSdk from 'lit-js-sdk';
-import { CryptoInNFTABI } from '../contracts/cryptoInNFT';
 import './Messages.css';
+import { shortenAddress } from "../helpers/utils";
 
-const ethers = require("ethers");
-
-export default function Messages({ provider, client, recipient, isCyberConnect }) {
+export default function Messages({ provider, client, recipient, enabled, setupClient }) {
 
     const [conversation, setConversation] = useState(null)
     const [messages, setMessages] = useState([]);
     const [sendLoading, setSendLoading] = useState(false);
     const [msg, setMsg] = useState('');
-    const [mintLoading, setMintLoading] = useState(false);
-    const [ownNFT, setOwnNFT] = useState(false);
 
     const [visible, setVisible] = useState(false);
 
-    const litClient = new LitJsSdk.LitNodeClient();
-    const nftContractAddress = "0xDD284A2BCA27495A982e79720Bf29cc599684bd1";
-    const nftContract = new ethers.Contract(nftContractAddress, CryptoInNFTABI, provider.getSigner());
-
-    const chain = 'rinkeby';
-
-    const accessControlConditions = [
-        {
-          contractAddress: nftContractAddress,
-          standardContractType: 'ERC721',
-          chain,
-          method: 'balanceOf',
-          parameters: [
-            ':userAddress'
-          ],
-          returnValueTest: {
-            comparator: '>',
-            value: '0'
-          }
-        }
-      ]
-    
-    const resourceId = {
-        baseUrl: '',
-        path: '/cryptoin', // this would normally be your url path, like "/webpage.html" for example
-        orgId: "",
-        role: "",
-        extraData: ""
-    }
-
-    const checkNFT = async () => {
-        try {
-            await litClient.connect();
-            const authSig = await LitJsSdk.checkAndSignAuthMessage({chain})
-            const jwt = await litClient.getSignedToken({ accessControlConditions, chain, authSig, resourceId });
-            if (jwt) {
-                setOwnNFT(true);
-            }
-        } catch(e) {
-            setOwnNFT(false);
-            notification['error']({
-                message: 'Error',
-                description: e.toString()
-            })
-        }
-    }
-
-    const mintNFT = async () => {
-        setMintLoading(true);
-        await nftContract.safeMint();
-        setMintLoading(false);
-    }
-
     const showDrawer = async () => {
+        if (!enabled) {
+            notification["error"]({
+                message: "You have to mint the chat NFT first"
+            })
+            return
+        }
+        if (!client) {
+            await setupClient();
+        }
         setVisible(true);
         try {
-            const nconv = await client.conversations.newConversation(recipient.address);
+            const nconv = await client.conversations.newConversation(recipient);
             setConversation(nconv);
         } catch(e) {
             console.log('UUUUU1', e);
@@ -134,8 +85,8 @@ export default function Messages({ provider, client, recipient, isCyberConnect }
       }, [conversation])
 
       const getActionButton = () => {
-          if (isCyberConnect) {
-              return (
+
+          return (
                 <Button 
                     onClick={showDrawer}
                     type="primary"
@@ -143,34 +94,21 @@ export default function Messages({ provider, client, recipient, isCyberConnect }
                     Chat
                 </Button>
               )
-          } else {
-            return (
-                <div className="nft-btns">
-                <Button 
-                    onClick={() => { mintNFT() }}
-                    type="primary"
-                    loading={mintLoading}
-                >
-                    Mint a CryptoIn NFT for free
-                </Button>
-                </div>
-              )
-          }
       }
 
     return (
       <div>
-        {client && (
-            <div className="conversation-item">
-                <img src={recipient.avatar} />
-                {recipient.name}
-                {getActionButton()}
+        <div className="conversation-item">
+            <div>
+            <img src="/avatar.png" />
+            {shortenAddress(recipient)}
             </div>
-        )}
-        <Drawer title={"Chat with " + recipient.name} placement="right" onClose={onClose} visible={visible} className="drawer-wrapper" width={555}>
+            {getActionButton()}
+        </div>
+        <Drawer title={"Chat with " + recipient} placement="right" onClose={onClose} visible={visible} className="drawer-wrapper" width={555}>
             <div className="messages">
                 {messages.map((msg) => {
-                    const isSender = msg.senderAddress === recipient.address
+                    const isSender = msg.senderAddress === recipient
                     return (
                 <div key={msg.id} className={isSender ? "message" :"my-message" }>
                     <span className="msg-item">{msg.content}</span>
@@ -184,7 +122,6 @@ export default function Messages({ provider, client, recipient, isCyberConnect }
                     type="primary" 
                     onClick={sendMsg} 
                     loading={sendLoading}
-                    disabled={isCyberConnect}
                 >
                     Send
                 </Button>

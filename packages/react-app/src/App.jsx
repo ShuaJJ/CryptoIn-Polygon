@@ -158,7 +158,7 @@ function App(props) {
           <MyAccount provider={injectedProvider} address={address} loadWeb3Modal={loadWeb3Modal} isPolygon={isPolygon} />
         </Route>
         <Route exact path="/chats">
-          <Conversations provider={injectedProvider} />
+         {injectedProvider && address && <Conversations provider={injectedProvider} address={address} />}
         </Route>
       </Switch>
 

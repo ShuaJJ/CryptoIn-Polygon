@@ -137,7 +137,7 @@ export default function Wallet(props) {
       extraPkDisplay.push(
         <div style={{ fontSize: 16, padding: 2, backgroundStyle: "#89e789" }}>
           <a href={"/pk#" + pk}>
-            <Address minimized address={wallet.address} ensProvider={props.ensProvider} /> {wallet.address.substr(0, 6)}
+            <Address minimized address={wallet.address} ensProvider={props.ensProvider} /> {wallet.address.substring(0, 6)}
           </a>
         </div>,
       );
@@ -152,7 +152,7 @@ export default function Wallet(props) {
               <div style={{ fontSize: 16 }}>
                 <a href={"/pk#" + pastpk}>
                   <Address minimized address={pastwallet.address} ensProvider={props.ensProvider} />{" "}
-                  {pastwallet.address.substr(0, 6)}
+                  {pastwallet.address.substring(0, 6)}
                 </a>
               </div>,
             );

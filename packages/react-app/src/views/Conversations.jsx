@@ -1,16 +1,32 @@
-import { notification } from "antd";
+import { notification, Button } from "antd";
 import { useEffect, useState } from "react";
+import LitJsSdk from 'lit-js-sdk';
+import { CryptoInNFTABI } from '../contracts/cryptoInNFT';
 import { Client } from '@xmtp/xmtp-js'
 
 import './Conversations.css';
 import Messages from "../components/Messages";
 import { LoadingOutlined } from "@ant-design/icons";
+import { useFollowings } from "../hooks/useFollowings";
+
+const ethers = require("ethers");
 
 
-export default function Conversations({ provider }) {
+export default function Conversations({ provider, address }) {
 
   const [client, setClient] = useState(null);
+  const [mintLoading, setMintLoading] = useState(false);
+  const [ownNFT, setOwnNFT] = useState(false);
+
+  const followings = useFollowings(address);
+
+  const litClient = new LitJsSdk.LitNodeClient();
+  const nftContractAddress = "0xDD284A2BCA27495A982e79720Bf29cc599684bd1";
+  const nftContract = new ethers.Contract(nftContractAddress, CryptoInNFTABI, provider.getSigner());
+
   const signer = provider.getSigner();
+
+  const chain = 'polygon';
 
   const setupClient = async () => {
     try {
@@ -25,34 +41,84 @@ export default function Conversations({ provider }) {
     }
   }
 
-  useEffect(() => {
-    if (!client) {
-      setupClient();
-    }
-  }, [])
+  // useEffect(() => {
+  //   checkNFT();
+  // }, [])
 
-  if (!client) {
-    return <div style={{marginTop: "32px"}}><LoadingOutlined /></div>
+  const accessControlConditions = [
+      {
+        contractAddress: nftContractAddress,
+        standardContractType: 'ERC721',
+        chain,
+        method: 'balanceOf',
+        parameters: [
+          ':userAddress'
+        ],
+        returnValueTest: {
+          comparator: '>',
+          value: '0'
+        }
+      }
+    ]
+
+  const resourceId = {
+      baseUrl: '',
+      path: '/cryptoin', // this would normally be your url path, like "/webpage.html" for example
+      orgId: "",
+      role: "",
+      extraData: ""
+  }
+
+  const checkNFT = async () => {
+      try {
+          await litClient.connect();
+          const authSig = await LitJsSdk.checkAndSignAuthMessage({chain})
+          const jwt = await litClient.getSignedToken({ accessControlConditions, chain, authSig, resourceId });
+          if (jwt) {
+              setOwnNFT(true);
+          }
+      } catch(e) {
+          setOwnNFT(false);
+          notification['error']({
+              message: 'Error',
+              description: e.toString()
+          })
+      }
+  }
+
+  const mintNFT = async () => {
+      setMintLoading(true);
+      await nftContract.safeMint();
+      setMintLoading(false);
   }
 
   return (
     <div className="convs">
-      <div className="convs-intro">Here you can message the developers of this dapp but under some conditions:</div>
-      <div className="convs-rule">You have to follow JeremyJ through CyberConnect in order to chat with him</div>
-      <Messages 
-        provider={provider} 
-        client={client} 
-        recipient={{ address: "0xC4cD7F3F5B282d40840E1C451EC93FFAE61514f9", avatar: "https://is4-ssl.mzstatic.com/image/thumb/Purple7/v4/0a/bf/ee/0abfee13-a9d6-bac8-52c3-96c4a9cd0d07/source/256x256bb.jpg", name: "JeremyJ" }} 
-        isCyberConnect={true} 
-      /> 
+      <div className="convs-intro">Here you can send encrypted message to the people you followed.</div>
+      {!ownNFT && (
+        <div style={{marginBottom: '64px'}}>
+          <div className="convs-rule">You need a messaging NFT from CryptoIn to enable this feature.</div>
+          <Button 
+              onClick={() => { mintNFT() }}
+              type="primary"
+              loading={mintLoading}
+          >
+              Mint a CryptoIn NFT for 2 MATIC
+          </Button>
+        </div>
+      )}
 
-<div className="convs-rule">You have to mint a CryptoIn NFT and be checked the ownership via Lit Protocol in order to chat with JoshuaJ</div>
-      <Messages 
-        provider={provider} 
-        client={client} 
-        recipient={{ address: "0x5DC27a3BB1501eA928137b10558DC8B42feA04f1", avatar: "https://i.pinimg.com/474x/ff/21/c9/ff21c94cf3bee40fd36ef911420106ca.jpg", name: "JoshuaJ" }} 
-        isCyberConnect={false} 
-      /> 
-    </div>
+
+
+        {followings?.map((following) => <Messages 
+          provider={provider} 
+          client={client} 
+          recipient={following} 
+          enabled={ownNFT} 
+          setupClient={setupClient}
+        /> )}
+
+
+      </div>
   );
 }

@@ -5,21 +5,11 @@ import CryptoInGrid from "../components/Grid";
 import PostModal from "../components/PostModal";
 import Deposit from "../components/Deposit";
 import "./MyAccount.css";
+import { btnStyle } from "../helpers/utils";
 
 const ethers = require("ethers");
 
 export default function MyAccount({ provider, address, isPolygon }) {
-
-  const btnStyle = {
-    width: "100%",
-    backgroundColor: "#00D3C5",
-    border: "none",
-    color: "#222",
-    height: "56px",
-    fontSize: "18px",
-    fontWeight: "600",
-    marginTop: "24px"
-  }
 
   const [bundlr, setBundlr] = useState();
   const [bundlrLoading, setBundlrLoading] = useState(false);
@@ -89,7 +79,10 @@ export default function MyAccount({ provider, address, isPolygon }) {
           {noBalance && <p style={{marginTop: '8px'}}>To post, you have to fund your wallet with MATIC first</p>}
         </div>
       ) : (
+        <div>
         <Button style={btnStyle} onClick={connectBundlr} loading={bundlrLoading}>Connect to Bundlr</Button>
+        <p style={{marginTop: '8px'}}>Connect to Bundlr to post</p>
+        </div>
       )}
       <h1 style={{marginTop: '66px'}}>My Posts</h1>
       <CryptoInGrid type="mine" myAddress={address} provider={provider} />

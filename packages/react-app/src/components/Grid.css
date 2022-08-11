@@ -13,12 +13,10 @@
 }
 
 .activities .ant-list-item-meta-description {
-    color: #fff;
     font-size: 18px;
 }
 
 .activities .ant-list-item-meta .ant-list-item-meta-content .ant-list-item-meta-title {
-    color: rgba(255, 255, 255, 0.45);
     font-weight: 400;
     font-size: 16px;
     margin-bottom: 2px;
