@@ -1,83 +1,73 @@
 import { notification, Button } from "antd";
 import { useEffect, useState } from "react";
-import { CryptoInNFTABI } from '../contracts/cryptoInNFT';
+import { LoadingOutlined } from "@ant-design/icons";
+import { Client } from '@xmtp/xmtp-js'
 
 import './Conversations.css';
 import Messages from "../components/Messages";
-import { LoadingOutlined } from "@ant-design/icons";
-import { useFollowings } from "../hooks/useFollowings";
+import { shortenAddress } from "../helpers/utils";
 
 const ethers = require("ethers");
 
 
 export default function Conversations({ provider, address }) {
 
-  const [mintLoading, setMintLoading] = useState(false);
-  const [checkLoading, setCheckLoading] = useState(false);
-  const [ownNFT, setOwnNFT] = useState(false);
+  const [client, setClient] = useState(null);
+  const [clientLoading, setClientLoading] = useState(false);
+  const [convLoading, setConvLoading] = useState(false);
+  const [allConversations, setAllConversations] = useState([]);
 
-  const followings = useFollowings(address);
+  const setupClient = async () => {
+    try {
+      setClientLoading(true);
+      const clientt = await Client.create(provider.getSigner(), {env: 'production'});
+      setClient(clientt);
+    } catch(e) {
+      notification['error']({
+        message: 'Error',
+        description: 'Cannot initialize a client'
+      })
+      console.error(e);
+    }
+    setClientLoading(false);
+  }
 
-  const nftContractAddress = "0xBCA82456c9461ad6E28b7bf2E4Df7Ac59cfbBCbB";
-  const nftContract = new ethers.Contract(nftContractAddress, CryptoInNFTABI, provider.getSigner());
+  const getConvs = async () => {
+    setConvLoading(true);
+    const allConvs = await client.conversations.list();
+    setAllConversations(allConvs);
+    setConvLoading(false);
+  }
 
   useEffect(() => {
-    checkNFT();
-  }, [])
-
-  const checkNFT = async () => {
-    setCheckLoading(true);
-    try {
-      const res = await nftContract.balanceOf(address);
-      setOwnNFT(ethers.BigNumber.from(res).toNumber() > 0);
-      setCheckLoading(false);
-    } catch(e) {
-      notification["error"]({
-        message: "Fetching NFT Failed",
-        description: e.toString()
-      })
-      setCheckLoading(false);
+    if (client) {
+      getConvs()
     }
-  }
-
-  const mintNFT = async () => {
-      setMintLoading(true);
-      const options = {value: ethers.utils.parseEther("0.1")}
-      try {
-        await nftContract.safeMint(options);
-      } catch(e) {
-        notification["error"]({
-          message: "Transaction Failed",
-          description: e.toString()
-        })
-      }
-      setMintLoading(false);
-  }
+  }, [client])
 
   return (
     <div className="convs">
       <div className="convs-intro">Here you can send encrypted message to the people you followed.</div>
-      {checkLoading && <div>Checking Chat NFT <LoadingOutlined /></div>}
-      {!checkLoading && !ownNFT && (
-        <div>
-          <div className="convs-rule">You need a messaging NFT from CryptoIn to enable this feature.</div>
-          <Button 
-              onClick={() => { mintNFT() }}
+      {!client && <Button 
+              onClick={() => { setupClient() }}
               type="primary"
-              loading={mintLoading}
+              loading={clientLoading}
           >
-              Mint a CryptoIn NFT for 2 MATIC
-          </Button>
-        </div>
-      )}
+              Setup Messaging Client
+          </Button>}
+
+        {client && convLoading && <LoadingOutlined />}
+
+        {client && !convLoading && allConversations.length == 0 && <div>You don't have any chats yet...</div>}
 
         <div style={{marginTop: '64px'}}>
-
-        {followings?.map((following) => <Messages 
-          provider={provider} 
-          recipient={following} 
-          enabled={true} 
-        /> )}
+          {allConversations.map((conv) => <div className="conversation-item">
+            <div>
+            <img src="/avatar.png" />
+            {shortenAddress(conv.peerAddress)}
+            </div>
+            <Messages conversation={conv} />
+        </div> )}
         </div>
 
 

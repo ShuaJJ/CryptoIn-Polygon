@@ -1,75 +1,46 @@
 import { useState, useEffect } from "react"
 import { Drawer, Button, Input, notification } from 'antd';
-import { Client } from '@xmtp/xmtp-js'
 import './Messages.css';
 import { shortenAddress } from "../helpers/utils";
 
-export default function Messages({ provider, recipient, enabled }) {
+export default function Messages({ client, conversation, address }) {
 
-    const [conversation, setConversation] = useState(null)
-    const [client, setClient] = useState(null);
     const [messages, setMessages] = useState([]);
+    const [currentConv, setCurrentConv] = useState()
     const [sendLoading, setSendLoading] = useState(false);
-    const [clientLoading, setClientLoading] = useState(false);
+    const [peerAddress, setPeerAddress] = useState('');
     const [msg, setMsg] = useState('');
 
     const [visible, setVisible] = useState(false);
 
-    const setupClient = async () => {
-        try {
-          const clientt = await Client.create(provider.getSigner(), {env: 'production'});
-          setClient(clientt);
-          return clientt;
-        } catch(e) {
-          notification['error']({
-            message: 'Error',
-            description: 'Cannot initialize a client'
-          })
-          console.error(e);
-          return undefined;
-        }
-      }
-
-    const showDrawer = async () => {
-        if (!enabled) {
-            notification["error"]({
-                message: "You have to mint the chat NFT first"
-            })
-            return
-        }
-        if (!client) {
-            setClientLoading(true);
-            try {
-                const cclient = await setupClient();
-                setClient(cclient);
-                setClientLoading(false);
-                setVisible(true);
-                try {
-                    const nconv = await cclient.conversations.newConversation("0x261DB4e5783Cecc65F05624C09fD37d4c883AD3f");
-                    setConversation(nconv);
-                } catch(e) {
-                    console.log('Creating Conversation Error: ', e);
-                }
-            } catch(e) {
-                notification["error"]({
-                    message: "Setup Client Error",
-                    description: "Failed to setup a xmtp client, please try again later"
-                })
-                setClientLoading(false);
-            }
-        } else {
-            setVisible(true);
-            try {
-                const nconv = await client.conversations.newConversation("0x261DB4e5783Cecc65F05624C09fD37d4c883AD3f");
-                setConversation(nconv);
-            } catch(e) {
-                console.log('Creating Conversation Error: ', e);
-            }
-        }
-    };
-
     const onClose = () => {
         setVisible(false);
+    };
+
+    const createConv = async () => {
+        try {
+            const nconv = await client.conversations.newConversation(address);
+            setCurrentConv(nconv);
+            setPeerAddress(address);
+        } catch(e) {
+            notification["error"]({
+                message: "Failed to chat",
+                description: "Target address is not on XMTP network"
+            });
+        }
+    }
+
+    useEffect(() => {
+        if (conversation) {
+            setCurrentConv(conversation);
+            setPeerAddress(conversation.peerAddress);
+        } else if (client && address) {
+            createConv();
+        }
+      }, [])
+
+    const showDrawer = () => {
+        setVisible(true);
     };
 
     const sendMsg = async () => {
@@ -80,10 +51,10 @@ export default function Messages({ provider, recipient, enabled }) {
             })
             return;
         }
-        if (conversation) {
+        if (currentConv) {
             setSendLoading(true)
             try {
-                await conversation.send(msg)
+                await currentConv.send(msg)
                 setSendLoading(false)
                 setMsg('');
                 getMsgs();
@@ -107,46 +78,34 @@ export default function Messages({ provider, recipient, enabled }) {
       };
 
     const getMsgs = async () => {
-        if (!conversation) {
+        if (!currentConv) {
           return
         }
         try {
-            setMessages(await conversation.messages({ pageSize: 100 }))
+            setMessages(await currentConv.messages({ pageSize: 100 }))
         } catch(e) {
-            console.log('UUUUU2', e);
+            console.log('Send Message Error', e);
         }
       }
 
       useEffect(() => {
-        getMsgs()
-      }, [conversation])
-
-      const getActionButton = () => {
-
-          return (
-                <Button 
-                    onClick={showDrawer}
-                    type="primary"
-                    loading={clientLoading}
-                >
-                    Chat
-                </Button>
-              )
-      }
+        if (currentConv) {
+            getMsgs();
+        }
+      }, [currentConv])
 
     return (
       <div>
-        <div className="conversation-item">
-            <div>
-            <img src="/avatar.png" />
-            {shortenAddress(recipient)}
-            </div>
-            {getActionButton()}
-        </div>
-        <Drawer title={"Chat with " + shortenAddress(recipient)} placement="right" onClose={onClose} visible={visible} className="drawer-wrapper" width={555}>
+        <Button 
+                    onClick={showDrawer}
+                    type="primary"
+                >
+                    Chat
+                </Button>
+        <Drawer title={"Chat with " + shortenAddress(peerAddress)} placement="right" onClose={onClose} visible={visible} className="drawer-wrapper" width={555}>
             <div className="messages">
                 {messages.map((msg) => {
-                    const isSender = msg.senderAddress === recipient
+                    const isSender = msg.senderAddress === peerAddress
                     return (
                 <div key={msg.id} className={isSender ? "message" :"my-message" }>
                     <span className="msg-item">{msg.content}</span>

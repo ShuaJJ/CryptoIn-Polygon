@@ -1,18 +1,25 @@
-import { Avatar, Button, List, Skeleton, Image, Popover } from 'antd';
+import { Avatar, Button, List, Skeleton, Image, Popover, notification } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
 import CyberConnect, { Env, Blockchain } from "@cyberlab/cyberconnect";
 import { useFollowings } from '../hooks/useFollowings';
+import { useOwnChatNFT } from '../hooks/useOwnChatNFT';
 import { getPosts, shortenAddress } from "../helpers/utils";
+import { Client } from '@xmtp/xmtp-js'
 import './Grid.css';
 import FollowBtn from './FollowButton';
+import Messages from './Messages';
+import NFTMintModal from './Tip';
 
 
 export default function CryptoInGrid({ type, myAddress, provider }) {
 
     const [activities, setActivities] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [client, setClient] = useState(null);
+    const [clientLoading, setClientLoading] = useState(false);
     const followeds = useFollowings(myAddress);
+    const ownNFT = useOwnChatNFT(provider);
 
     const cyberConnect = new CyberConnect({
         namespace: "CryptoIn",
@@ -21,6 +28,21 @@ export default function CryptoInGrid({ type, myAddress, provider }) {
         provider: provider,
         signingMessageEntity: "CryptoIn",
       });
+
+      const setupClient = async () => {
+        try {
+          setClientLoading(true);
+          const clientt = await Client.create(provider.getSigner(), {env: 'production'});
+          setClient(clientt);
+        } catch(e) {
+          notification['error']({
+            message: 'Error',
+            description: 'Cannot initialize a client'
+          })
+          console.error(e);
+        }
+        setClientLoading(false);
+      }
 
     const getActivities = async () => {
         setLoading(true);
@@ -66,12 +88,18 @@ export default function CryptoInGrid({ type, myAddress, provider }) {
                     <Avatar src="/avatar.png" /> :
                 <Popover placement="bottom" content={(<div className='profile-card'>
                         <Avatar src="/avatar.png" />
-                        {item.createdBy}
+                        {shortenAddress(item.createdBy)}
+
                         <FollowBtn 
                             address={item.createdBy} 
                             followeds={followeds} 
                             cyberConnect={cyberConnect}
                         />
+
+                        { !ownNFT && <NFTMintModal provider={provider} /> }
+                        { ownNFT && !client && <Button type="primary" loading={clientLoading} onClick={setupClient}>Chat</Button> }
+                        { ownNFT && client && <Messages client={client} address={item.createdBy} />}
+                        
                 </div>)}>
                     <Avatar src="/avatar.png" />
                 </Popover>

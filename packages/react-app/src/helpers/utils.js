@@ -1,7 +1,7 @@
 import Arweave from 'arweave'
 
 export const arweave = Arweave.init({})
-export const APP_NAME = "CryptoIn"
+export const APP_NAME = "CryptoIn-APP"
 
 export const btnStyle = {
   width: "100%",
@@ -98,5 +98,10 @@ export const getPosts = async (owners) => {
 }
 
 export const shortenAddress = (address) => {
+  if (!address || address.length < 12) {
+    return '';
+  }
   return address.substring(0, 5) + '....' + address.substring(address.length-5)
 }
+
+export const nftContractAddress = "0x5a87dCeFC2dbf5Bd84B1d7946e73e0dC120D8c50";

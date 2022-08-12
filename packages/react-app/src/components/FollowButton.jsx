@@ -19,8 +19,10 @@ export default function FollowBtn({ address, followeds, cyberConnect }) {
             console.log(address)
             if (followed) {
                 await cyberConnect.disconnect(address);
+                setFollowed(false);
             } else {
                 await cyberConnect.connect(address);
+                setFollowed(true);
             }
         } catch(e) {
             console.log('Follow Error', e);

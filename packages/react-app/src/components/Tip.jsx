@@ -1,26 +1,36 @@
-import {WalletABI} from '../contracts/wallet';
+import { CryptoInNFTABI } from '../contracts/cryptoInNFT';
 import { InputNumber, Modal, Button, notification } from 'antd';
 import { useState } from 'react';
+import { nftContractAddress } from '../helpers/utils';
 const ethers = require("ethers");
 
-export default function Tip({ signer }) {
-
-    const walletContract = new ethers.Contract("0x12Fd542974c73Be6D9E5127E7e7DFA8a4cee5419", WalletABI, signer);
+export default function NFTMintModal({ provider }) {
 
     const [loading, setLoading] = useState(false);
-    const [amount, setAmount] = useState(0.01);
+    const [amount, setAmount] = useState(1);
 
-    const tip = async () => {
-        try {
-            await walletContract.tip("0xe6259caE435525D698b26E6c5792CA8E6B410D2C", ethers.utils.parseEther(amount.toString()))
-        } catch(e) {
-            notification["error"]({
-                message: 'Error',
-                description:
-                  "Insufficient funds in your CryptoIn wallet. Please use the wallet button on the top right corner to deposit first"
-              });
-        }
-    }
+    const nftContract = new ethers.Contract(nftContractAddress, CryptoInNFTABI, provider.getSigner());
+
+    const mintNFT = async () => {
+      if (amount < 0.01) {
+        notification["error"]({
+          message: "Mint Failed",
+          description: "Minimum is 0.01"
+        })
+        return;
+      }
+      setLoading(true);
+      const options = {value: ethers.utils.parseEther(amount.toString())}
+      try {
+        await nftContract.safeMint(options);
+      } catch(e) {
+        notification["error"]({
+          message: "Mint Failed",
+          description: e.toString()
+        })
+      }
+      setLoading(false);
+  }
 
     const onChange = (value) => {
         setAmount(value);
@@ -34,9 +44,7 @@ export default function Tip({ signer }) {
       };
     
       const handleOk = async () => {
-        setLoading(true);
-        await tip();
-        setLoading(false);
+        await mintNFT();
         setIsModalVisible(false);
       };
     
@@ -47,17 +55,18 @@ export default function Tip({ signer }) {
 
     return <>
 
-    <Button type="primary" onClick={showModal}>
-        Buy me an expensive coffee
+      <Button type="primary" onClick={showModal}>
+        Chat
       </Button>
       <Modal 
-        title="Tip the developer" 
+        title="Mint CryptoIn Messaging NFT" 
         visible={isModalVisible} 
         onOk={handleOk} 
         onCancel={handleCancel} 
-        okText="Tip"
+        okText="Mint"
         okButtonProps={{loading: loading}}
     >
+        <div style={{marginBottom: "15px"}}>To message other addresses, tip the developer to mint a messaging NFT first, minimum 0.01 :)</div>
         <InputNumber min={0.01} max={9999} value={amount} onChange={onChange} style={{width: "100%"}} />
       </Modal>
     </>

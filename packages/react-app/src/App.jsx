@@ -12,9 +12,7 @@ import { NETWORKS, ALCHEMY_KEY } from "./constants";
 import { Web3ModalSetup } from "./helpers";
 import { Home, Following, MyAccount } from "./views";
 import { useStaticJsonRPC } from "./hooks";
-import Tip from "./components/Tip";
 import Conversations from "./views/Conversations";
-import { LoadingOutlined } from "@ant-design/icons";
 
 const { ethers } = require("ethers");
 const initialNetwork = NETWORKS.polygon;

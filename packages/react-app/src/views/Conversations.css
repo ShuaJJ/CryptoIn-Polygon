@@ -14,3 +14,31 @@
     margin-bottom: 32px;
     margin-top: 64px;
 }
+
+.conversation-item {
+    font-size: 22px;
+    display: flex;
+    justify-content: space-between;
+    max-width: 500px;
+    margin: 32px auto;
+}
+
+.conversation-item button {
+    margin-top: 15px;
+}
+
+.conversation-item .nft-btns button {
+    margin-left: 15px;
+    width: 215px;
+    height: 36px;
+}
+
+.conversation-item .nft-btns {
+    padding-top: 20px;
+}
+
+.conversation-item img {
+    width: 64px;
+    border-radius: 32px;
+    margin-right: 15px;
+}
