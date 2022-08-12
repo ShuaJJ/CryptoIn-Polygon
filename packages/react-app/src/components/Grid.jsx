@@ -24,7 +24,7 @@ export default function CryptoInGrid({ type, myAddress, provider }) {
 
     const getActivities = async () => {
         setLoading(true);
-        let owners;
+        let owners = undefined;
         if (type === 'following') {
             owners = followeds;
         } else if (type === 'mine') {
@@ -62,7 +62,7 @@ export default function CryptoInGrid({ type, myAddress, provider }) {
         <List.Item>
             <Skeleton avatar title={false} loading={item.loading} active>
             <List.Item.Meta
-                avatar={myAddress.toLowerCase() === item.createdBy.toLowerCase() ? 
+                avatar={myAddress.toLowerCase() === item.createdBy ? 
                     <Avatar src="/avatar.png" /> :
                 <Popover placement="bottom" content={(<div className='profile-card'>
                         <Avatar src="/avatar.png" />

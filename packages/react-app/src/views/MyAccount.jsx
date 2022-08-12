@@ -86,7 +86,7 @@ export default function MyAccount({ provider, address, isPolygon }) {
       )}
       <h1 style={{marginTop: '66px'}}>My Posts</h1>
       <CryptoInGrid type="mine" myAddress={address} provider={provider} />
-      <PostModal isModalVisible={isModalVisible} handleOk={handleOk} handleCancel={handleCancel} bundlr={bundlr} />
+      <PostModal isModalVisible={isModalVisible} handleOk={handleOk} handleCancel={handleCancel} bundlr={bundlr} myAddress={address} />
     </div>
   );
 }

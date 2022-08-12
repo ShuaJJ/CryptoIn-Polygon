@@ -10,7 +10,7 @@ import {
 } from "./components";
 import { NETWORKS, ALCHEMY_KEY } from "./constants";
 import { Web3ModalSetup } from "./helpers";
-import { Feeds, MyAccount } from "./views";
+import { Home, Following, MyAccount } from "./views";
 import { useStaticJsonRPC } from "./hooks";
 import Tip from "./components/Tip";
 import Conversations from "./views/Conversations";
@@ -149,10 +149,10 @@ function App(props) {
       <Switch>
         <Route exact path="/">
           {/* pass in any web3 props to this Home component. For example, yourLocalBalance */}
-          <Feeds type="home" address={address} provider={injectedProvider} />
+          {injectedProvider && <Home address={address} provider={injectedProvider} />}
         </Route>
         <Route exact path="/following">
-        <Feeds type="following" address={address} provider={injectedProvider} />
+          {injectedProvider && <Following address={address} provider={injectedProvider} />}
         </Route>
         <Route path="/mine">
           <MyAccount provider={injectedProvider} address={address} loadWeb3Modal={loadWeb3Modal} isPolygon={isPolygon} />

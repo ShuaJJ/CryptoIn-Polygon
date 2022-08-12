@@ -1,7 +1,6 @@
 import { notification, Button } from "antd";
 import { useEffect, useState } from "react";
 import { CryptoInNFTABI } from '../contracts/cryptoInNFT';
-import { Client } from '@xmtp/xmtp-js'
 
 import './Conversations.css';
 import Messages from "../components/Messages";
@@ -13,49 +12,37 @@ const ethers = require("ethers");
 
 export default function Conversations({ provider, address }) {
 
-  const [client, setClient] = useState(null);
   const [mintLoading, setMintLoading] = useState(false);
+  const [checkLoading, setCheckLoading] = useState(false);
   const [ownNFT, setOwnNFT] = useState(false);
 
   const followings = useFollowings(address);
 
-  const nftContractAddress = "0x779c99468735b9c3e7CA1f54BB0450D349A9af8f";
+  const nftContractAddress = "0xBCA82456c9461ad6E28b7bf2E4Df7Ac59cfbBCbB";
   const nftContract = new ethers.Contract(nftContractAddress, CryptoInNFTABI, provider.getSigner());
-
-  const signer = provider.getSigner();
-
-  const setupClient = async () => {
-    try {
-      const clientt = await Client.create(signer);
-      setClient(clientt);
-    } catch(e) {
-      notification['error']({
-        message: 'Error',
-        description: 'Cannot initialize a client'
-      })
-      console.error(e);
-    }
-  }
 
   useEffect(() => {
     checkNFT();
   }, [])
 
   const checkNFT = async () => {
+    setCheckLoading(true);
     try {
       const res = await nftContract.balanceOf(address);
       setOwnNFT(ethers.BigNumber.from(res).toNumber() > 0);
+      setCheckLoading(false);
     } catch(e) {
       notification["error"]({
         message: "Fetching NFT Failed",
         description: e.toString()
       })
+      setCheckLoading(false);
     }
   }
 
   const mintNFT = async () => {
       setMintLoading(true);
-      const options = {value: ethers.utils.parseEther("2")}
+      const options = {value: ethers.utils.parseEther("0.1")}
       try {
         await nftContract.safeMint(options);
       } catch(e) {
@@ -70,7 +57,8 @@ export default function Conversations({ provider, address }) {
   return (
     <div className="convs">
       <div className="convs-intro">Here you can send encrypted message to the people you followed.</div>
-      {!ownNFT && (
+      {checkLoading && <div>Checking Chat NFT <LoadingOutlined /></div>}
+      {!checkLoading && !ownNFT && (
         <div>
           <div className="convs-rule">You need a messaging NFT from CryptoIn to enable this feature.</div>
           <Button 
@@ -87,10 +75,8 @@ export default function Conversations({ provider, address }) {
 
         {followings?.map((following) => <Messages 
           provider={provider} 
-          client={client} 
           recipient={following} 
-          enabled={ownNFT} 
-          setupClient={setupClient}
+          enabled={true} 
         /> )}
         </div>
 

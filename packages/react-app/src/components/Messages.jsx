@@ -1,17 +1,34 @@
 import { useState, useEffect } from "react"
 import { Drawer, Button, Input, notification } from 'antd';
+import { Client } from '@xmtp/xmtp-js'
 import './Messages.css';
 import { shortenAddress } from "../helpers/utils";
 
-export default function Messages({ provider, client, recipient, enabled, setupClient }) {
+export default function Messages({ provider, recipient, enabled }) {
 
     const [conversation, setConversation] = useState(null)
+    const [client, setClient] = useState(null);
     const [messages, setMessages] = useState([]);
     const [sendLoading, setSendLoading] = useState(false);
     const [clientLoading, setClientLoading] = useState(false);
     const [msg, setMsg] = useState('');
 
     const [visible, setVisible] = useState(false);
+
+    const setupClient = async () => {
+        try {
+          const clientt = await Client.create(provider.getSigner(), {env: 'production'});
+          setClient(clientt);
+          return clientt;
+        } catch(e) {
+          notification['error']({
+            message: 'Error',
+            description: 'Cannot initialize a client'
+          })
+          console.error(e);
+          return undefined;
+        }
+      }
 
     const showDrawer = async () => {
         if (!enabled) {
@@ -23,11 +40,12 @@ export default function Messages({ provider, client, recipient, enabled, setupCl
         if (!client) {
             setClientLoading(true);
             try {
-                await setupClient();
+                const cclient = await setupClient();
+                setClient(cclient);
                 setClientLoading(false);
                 setVisible(true);
                 try {
-                    const nconv = await client.conversations.newConversation(recipient);
+                    const nconv = await cclient.conversations.newConversation("0x261DB4e5783Cecc65F05624C09fD37d4c883AD3f");
                     setConversation(nconv);
                 } catch(e) {
                     console.log('Creating Conversation Error: ', e);
@@ -38,6 +56,14 @@ export default function Messages({ provider, client, recipient, enabled, setupCl
                     description: "Failed to setup a xmtp client, please try again later"
                 })
                 setClientLoading(false);
+            }
+        } else {
+            setVisible(true);
+            try {
+                const nconv = await client.conversations.newConversation("0x261DB4e5783Cecc65F05624C09fD37d4c883AD3f");
+                setConversation(nconv);
+            } catch(e) {
+                console.log('Creating Conversation Error: ', e);
             }
         }
     };

@@ -39,7 +39,7 @@ export const createPostInfo = async (node) => {
 
  export const buildQuery = (authors) => {
   let stringifiedTags = [...tags]
-  if (authors) {
+  if (authors !== undefined) {
     stringifiedTags = [...tags, {
       name: "Author",
       values: authors.map((author) => author.toLowerCase())

@@ -9,7 +9,7 @@ import './PostModal.css';
 const ethers = require("ethers");
 const { TextArea } = Input;
 
-const PostModal = ({isModalVisible, handleOk, handleCancel, bundlr}) => {
+const PostModal = ({isModalVisible, handleOk, handleCancel, bundlr, myAddress}) => {
 
     const [content, setContent] = useState('');
     const [file, setFile] = useState()
@@ -57,7 +57,7 @@ const PostModal = ({isModalVisible, handleOk, handleCancel, bundlr}) => {
             const tags = [
                 { name: 'Content-Type', value: 'text/plain' },
                 { name: 'App-Name', value: APP_NAME },
-                { name: 'Author', value: bundlr.address },
+                { name: 'Author', value: myAddress.toLowerCase() },
             ]
 
             let imageURI = '';
@@ -74,7 +74,7 @@ const PostModal = ({isModalVisible, handleOk, handleCancel, bundlr}) => {
                 content,
                 imageURI,
                 createdAt: new Date(),
-                createdBy: bundlr.address,
+                createdBy: myAddress,
             }
 
             try {
@@ -123,7 +123,6 @@ const PostModal = ({isModalVisible, handleOk, handleCancel, bundlr}) => {
         }
     }
 
-
   return (
     <Modal 
         title="Post something about your work or project" 
@@ -133,7 +132,7 @@ const PostModal = ({isModalVisible, handleOk, handleCancel, bundlr}) => {
         afterClose={clear}
         okButtonProps={{loading: postLoading}}
     >
-        <div style={{textAlign: "center", marginBottom: "15px"}}>
+        <div className="upload-wrapper">
             <Upload
                 name="Image File"
                 multiple={false}

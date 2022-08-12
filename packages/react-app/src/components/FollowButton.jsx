@@ -8,7 +8,7 @@ export default function FollowBtn({ address, followeds, cyberConnect }) {
 
 
     useEffect(() => {
-        if (followeds && followeds.indexOf(address) > -1) {
+        if (followeds && followeds.indexOf(address.toLowerCase()) > -1) {
             setFollowed(true);
         }
     }, [followeds])
@@ -16,6 +16,7 @@ export default function FollowBtn({ address, followeds, cyberConnect }) {
     const follow = async () => {
         setFollowLoading(true);
         try {
+            console.log(address)
             if (followed) {
                 await cyberConnect.disconnect(address);
             } else {

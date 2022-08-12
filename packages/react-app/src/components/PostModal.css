@@ -6,3 +6,17 @@
 .preview-img {
     max-width: 100%;
 }
+
+.upload-wrapper {
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.upload-wrapper .ant-upload.ant-upload-select-picture-card {
+    width: 200px;
+    height: 200px;
+}
+
+.upload-wrapper .ant-upload.ant-upload-select-picture-card .preview-img {
+    max-height: 200px;
+}

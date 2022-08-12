@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { GraphQLClient, gql } from "graphql-request";
 
 export const useFollowings = (myAddress) => {
-  const [followeds, setFolloweds] = useState();
+  const [followeds, setFolloweds] = useState([]);
 
   const graphClient = new GraphQLClient("https://api.cybertino.io/connect/");
 
@@ -22,7 +22,7 @@ export const useFollowings = (myAddress) => {
     const getFollowers = async () => {
       if (myAddress) {
         const res = await graphClient.request(GET_CONNECTIONS, { address: myAddress, first: 50 });
-        const followings = res?.identity?.followings?.list.map((following) => following.address);
+        const followings = res?.identity?.followings?.list.map((following) => following.address) ?? [];
         setFolloweds(followings);
       }
     }

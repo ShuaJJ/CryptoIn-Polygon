@@ -6,11 +6,11 @@ import CryptoInGrid from "../components/Grid";
  * @param {*} readContracts contracts from current chain already pre-loaded using ethers contract module. More here https://docs.ethers.io/v5/api/contract/contract/
  * @returns react component
  **/
-function Feeds({ type, address, provider }) {
+function Home({ address, provider }) {
 
   return (
-    <CryptoInGrid type={type} myAddress={address} provider={provider} />
+    <CryptoInGrid type="home" myAddress={address} provider={provider} />
   );
 }
 
-export default Feeds;
+export default Home;
