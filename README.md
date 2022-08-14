@@ -2,6 +2,9 @@
 
 ## Track - Web3 version of LinkedIn
 
+There is one contract deployed on Polygon mainnet, which is used for minting NFTs:
+https://polygonscan.com/address/0x5a87dCeFC2dbf5Bd84B1d7946e73e0dC120D8c50
+
 ### CryptoIn is fully decentralized! No central servers are used!
 
 Although currently Twitter is still the main social platform for crypto people, it’s still a web2 platform and crypto is just a small part of it. Second of all, without identity verification, there are lots of scammers pretending they are crypto professionals. So sometimes, people can connect with wrong person. There are not many decentralized features and technologies involved as well. Last but not least, nowadays in crypto, how can we miss earnings while using the app?

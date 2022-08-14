@@ -26,7 +26,7 @@ export const createPostInfo = async (node) => {
     timestamp: timestamp,
   }
   
-  postInfo.request = await arweave.api.get(`/${node.id}`, { timeout: 10000 })
+  postInfo.request = await arweave.api.get(`https://arweave.net/${node.id}`, { timeout: 10000 })
   return postInfo;
  }
 
@@ -79,7 +79,7 @@ export const createPostInfo = async (node) => {
 export const getPosts = async (owners) => {
   try {
     const query = buildQuery(owners)
-    const results = await arweave.api.post('/graphql', query)
+    const results = await arweave.api.post('https://arweave.net/graphql', query)
     .catch(err => {
       console.error('GraphQL query failed')
       throw new Error(err);

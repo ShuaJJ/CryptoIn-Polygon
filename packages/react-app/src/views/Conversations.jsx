@@ -47,7 +47,7 @@ export default function Conversations({ provider, address }) {
 
   return (
     <div className="convs">
-      <div className="convs-intro">Here you can send encrypted message to the people you followed.</div>
+      <div className="convs-intro">Here are the conversations you had with others.</div>
       {!client && <Button 
               onClick={() => { setupClient() }}
               type="primary"
