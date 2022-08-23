@@ -2,11 +2,11 @@
 
 ### CryptoIn - Web3 version of LinkedIn
 
-https://crypto-in.surge.sh/
+Live URL: https://crypto-in-app.surge.sh
 
-### Relative codes
+Video Demo: https://youtu.be/8N4KMhb2HiU
 
-packages/react-app/src/helpers/Web3ModalSetup.js
+Relative codes: packages/react-app/src/helpers/Web3ModalSetup.js
 
 ### CryptoIn is fully decentralized! No central servers are used!
 
@@ -21,3 +21,4 @@ Here comes CryptoIn, a web3 professional social platform built with decentralize
 
  1. My Ethereum wallet address is: 0xe6259caE435525D698b26E6c5792CA8E6B410D2C (joshua.888)
  2. My Email address and Unstoppable login is: Sody008@gmail.com
+ 3. Discord ID: ShuaJJ#6191

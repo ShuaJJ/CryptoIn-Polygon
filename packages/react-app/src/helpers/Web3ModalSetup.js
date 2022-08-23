@@ -18,7 +18,7 @@ const walletLinkProvider = walletLink.makeWeb3Provider(`https://eth-mainnet.alch
 
 export const uauthOptions = {
   clientID: "c5c05640-6b92-46c2-9363-e0a35c20c504",
-  redirectUri: "https://crypto-in.surge.sh",
+  redirectUri: "https://crypto-in-app.surge.sh",
   scope: "openid wallet",
   shouldLoginWithRedirect: false
 }
