@@ -2,6 +2,8 @@ import Portis from "@portis/web3";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import Authereum from "authereum";
 import Fortmatic from "fortmatic";
+import * as UAuthWeb3Modal from '@uauth/web3modal'
+import UAuthSPA from '@uauth/js'
 import WalletLink from "walletlink";
 import Web3Modal from "web3modal";
 import { ALCHEMY_KEY, INFURA_ID } from "../constants";
@@ -13,6 +15,13 @@ const walletLink = new WalletLink({
 
 // WalletLink provider
 const walletLinkProvider = walletLink.makeWeb3Provider(`https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_KEY}`, 1);
+
+export const uauthOptions = {
+  clientID: "c5c05640-6b92-46c2-9363-e0a35c20c504",
+  redirectUri: "https://crypto-in.surge.sh",
+  scope: "openid wallet",
+  shouldLoginWithRedirect: false
+}
 
 // Portis ID: 6255fb2b-58c8-433b-a2c9-62098c05ddc9
 /**
@@ -39,6 +48,19 @@ const web3ModalSetup = () =>
             71401: "https://godwoken-testnet-v1.ckbapp.dev",
           },
         },
+      },
+      'custom-uauth': {
+        // The UI Assets
+        display: UAuthWeb3Modal.display,
+    
+        // The Connector
+        connector: UAuthWeb3Modal.connector,
+    
+        // The SPA libary
+        package: UAuthSPA,
+    
+        // The SPA libary options
+        options: uauthOptions,
       },
       portis: {
         display: {

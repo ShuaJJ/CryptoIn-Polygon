@@ -2,6 +2,7 @@ import { Menu } from "antd";
 import "antd/dist/antd.css";
 import React, { useCallback, useEffect, useState } from "react";
 import { Link, Route, Switch, useLocation } from "react-router-dom";
+import * as UAuthWeb3Modal from '@uauth/web3modal'
 import "./App.css";
 import {
   Account,
@@ -73,6 +74,7 @@ function App(props) {
   }, [userSigner]);
 
   const loadWeb3Modal = useCallback(async () => {
+    UAuthWeb3Modal.registerWeb3Modal(web3Modal)
     const provider = await web3Modal.connect();
     const ip = new ethers.providers.Web3Provider(provider);
     setInjectedProvider(ip);
@@ -144,21 +146,21 @@ function App(props) {
         </Menu.Item>
       </Menu>
 
-      <Switch>
+      {injectedProvider ? <Switch>
         <Route exact path="/">
           {/* pass in any web3 props to this Home component. For example, yourLocalBalance */}
-          {injectedProvider && <Home address={address} provider={injectedProvider} />}
+          <Home address={address} provider={injectedProvider} />
         </Route>
         <Route exact path="/following">
-          {injectedProvider && <Following address={address} provider={injectedProvider} />}
+          <Following address={address} provider={injectedProvider} />
         </Route>
         <Route path="/mine">
           <MyAccount provider={injectedProvider} address={address} loadWeb3Modal={loadWeb3Modal} isPolygon={isPolygon} />
         </Route>
         <Route exact path="/chats">
-         {injectedProvider && address && <Conversations provider={injectedProvider} address={address} />}
+         {address && <Conversations provider={injectedProvider} address={address} />}
         </Route>
-      </Switch>
+      </Switch> : <div style={{marginTop: '32px'}}>Please connect your wallet first</div>}
 
     </div>
   );
