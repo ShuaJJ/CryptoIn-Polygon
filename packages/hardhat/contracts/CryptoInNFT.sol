@@ -14,8 +14,8 @@ contract CryptoInNFT is ERC721, ERC721Enumerable, Ownable {
     constructor() ERC721("CryptoInNFT", "CINFT") {}
 
     function safeMint() payable public {
-        uint256 price = 10**18 * 2;
-        require(msg.value == price, "Requires 2 MATIC to mint");
+        uint256 price = 10**18 * 0.01;
+        require(msg.value >= price, "Requires at least 0.01 MATIC to mint");
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(msg.sender, tokenId);

@@ -27,7 +27,7 @@ const { isAddress, getAddress, formatUnits, parseUnits } = utils;
 //
 // Select the network you want to deploy to here:
 //
-const defaultNetwork = "localhost";
+const defaultNetwork = "matic";
 
 const mainnetGwei = 21;
 
@@ -133,7 +133,7 @@ module.exports = {
     polygon: {
       url: "https://polygon-rpc.com",
       // url: "https://speedy-nodes-nyc.moralis.io/XXXXXXXXXXXXXXXXXXXx/polygon/mainnet", // <---- YOUR MORALIS ID! (not limited to infura)
-      gasPrice: 3200000000,
+      gasPrice: 3800000000,
       accounts: {
         mnemonic: mnemonic(),
       },
@@ -147,8 +147,7 @@ module.exports = {
       },
     },
     matic: {
-      url: "https://rpc-mainnet.maticvigil.com/",
-      gasPrice: 1000000000,
+      url: "https://polygon-rpc.com/",
       accounts: {
         mnemonic: mnemonic(),
       },

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { CryptoInNFTABI } from '../contracts/cryptoInNFT';
+import { CryptoInNFTABI } from '../contracts';
 import { nftContractAddress } from "../helpers/utils";
 import { notification } from "antd";
 const ethers = require("ethers");

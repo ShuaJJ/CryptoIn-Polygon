@@ -76,6 +76,8 @@ export default function CryptoInGrid({ type, myAddress, provider }) {
         )
     }
 
+    
+
     return <List
         className={"activities" + (type === 'mine' ? ' mine' : '')}
         itemLayout="vertical"
@@ -84,7 +86,7 @@ export default function CryptoInGrid({ type, myAddress, provider }) {
         <List.Item>
             <Skeleton avatar title={false} loading={item.loading} active>
             <List.Item.Meta
-                avatar={myAddress.toLowerCase() === item.createdBy ? 
+                avatar={myAddress === item.createdBy ? 
                     <Avatar src="/avatar.png" /> :
                 <Popover placement="bottom" content={(<div className='profile-card'>
                         <Avatar src="/avatar.png" />

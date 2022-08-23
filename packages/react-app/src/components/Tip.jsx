@@ -1,4 +1,4 @@
-import { CryptoInNFTABI } from '../contracts/cryptoInNFT';
+import { CryptoInNFTABI } from '../contracts';
 import { InputNumber, Modal, Button, notification } from 'antd';
 import { useState } from 'react';
 import { nftContractAddress } from '../helpers/utils';

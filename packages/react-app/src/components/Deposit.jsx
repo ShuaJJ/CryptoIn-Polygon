@@ -1,4 +1,4 @@
-import {WalletABI} from '../contracts/wallet';
+import {WalletABI} from '../contracts';
 import { InputNumber, Modal, Button, notification } from 'antd';
 import { InfoOutlined, WalletOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
