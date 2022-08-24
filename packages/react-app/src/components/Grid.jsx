@@ -10,6 +10,7 @@ import './Grid.css';
 import FollowBtn from './FollowButton';
 import Messages from './Messages';
 import NFTMintModal from './Tip';
+import CryptoPaymentModal from './Payment';
 
 
 export default function CryptoInGrid({ type, myAddress, provider }) {
@@ -82,7 +83,14 @@ export default function CryptoInGrid({ type, myAddress, provider }) {
         className={"activities" + (type === 'mine' ? ' mine' : '')}
         itemLayout="vertical"
         dataSource={activities}
-        renderItem={(item) => (
+        renderItem={(item) => {
+          let receiver;
+          if (item.createdBy === '0xe6259caE435525D698b26E6c5792CA8E6B410D2C') {
+            receiver = 'joshua.888'
+          } else if (item.createdBy === '0x261DB4e5783Cecc65F05624C09fD37d4c883AD3f') {
+            receiver = 'joshuaj.888'
+          }
+          return (
         <List.Item>
             <Skeleton avatar title={false} loading={item.loading} active>
             <List.Item.Meta
@@ -90,7 +98,7 @@ export default function CryptoInGrid({ type, myAddress, provider }) {
                     <Avatar src="/avatar.png" /> :
                 <Popover placement="bottom" content={(<div className='profile-card'>
                         <Avatar src="/avatar.png" />
-                        {shortenAddress(item.createdBy)}
+                        {receiver ?? shortenAddress(item.createdBy)}
 
                         <FollowBtn 
                             address={item.createdBy} 
@@ -101,6 +109,8 @@ export default function CryptoInGrid({ type, myAddress, provider }) {
                         { !ownNFT && <NFTMintModal provider={provider} /> }
                         { ownNFT && !client && <Button type="primary" loading={clientLoading} onClick={setupClient}>Chat</Button> }
                         { ownNFT && client && <Messages client={client} address={item.createdBy} />}
+                        { receiver && <CryptoPaymentModal provider={provider} udomain={receiver} /> }
+
                         
                 </div>)}>
                     <Avatar src="/avatar.png" />
@@ -113,6 +123,6 @@ export default function CryptoInGrid({ type, myAddress, provider }) {
             {item.imageURI && <div className='img-wrapper'><Image src={item.imageURI} /></div>}
             </Skeleton>
         </List.Item>
-        )}
+        )}}
     />
   }
